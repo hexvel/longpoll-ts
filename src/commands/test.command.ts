@@ -1,15 +1,17 @@
-import { getRandomId } from "vk-io";
+import { Context, getRandomId } from "vk-io";
 import { IBotContext } from "../context/context.interface";
-import { Command } from "./command.class";
+import { Command } from "./command.module";
 
 export class TestCommand extends Command {
   constructor(bot: IBotContext) {
     super(bot);
   }
 
-  handle(): void {
+  handle(context: Context): void {
+    console.log(context);
+
     this.bot.api.messages.send({
-      peer_id: 715616525,
+      peer_id: context.peerId,
       message: "Test",
       random_id: getRandomId(),
     });

@@ -1,50 +1,32 @@
 import { PrismaClient } from "@prisma/client";
 import { Context, VK } from "vk-io";
-
-import { Command } from "./commands/command.module";
-import { TestCommand } from "./commands/test.command";
-
 import { ConfigService } from "./config/config.service";
 import { IBotContext } from "./context/context.interface";
 
-export class Bot {
+export class BotModule {
   bot: IBotContext;
-  commands: Command[] = [];
+  prisma: PrismaClient;
 
   constructor(private readonly configService: ConfigService) {
     this.bot = new VK({
       token: this.configService.get("TOKEN"),
     }) as IBotContext;
-    this.bot.prisma = new PrismaClient();
-    this.setupCommands();
-  }
-
-  setupCommands() {
-    this.commands.push(new TestCommand(this.bot));
+    this.prisma = new PrismaClient();
   }
 
   async start() {
     await this.setupHandlers();
-    await this.bot.prisma.$connect();
+    await this.prisma.$connect();
     await this.bot.updates.start();
   }
 
   private async setupHandlers() {
     this.bot.updates.on("message_new", this.handleNewMessage.bind(this));
+    // Другие обработчики событий можно добавить здесь
   }
 
   private async handleNewMessage(context: Context, next: () => void) {
-    const messageText = context.text.toLowerCase().trim();
-
-    switch (messageText) {
-      case "test":
-        const command = this.commands.find(cmd => cmd instanceof TestCommand);
-        if (command) command.handle(context);
-        break;
-    }
-    next();
+    console.log("New message:", context.text);
+    await next();
   }
 }
-
-const bot = new Bot(new ConfigService());
-bot.start();
