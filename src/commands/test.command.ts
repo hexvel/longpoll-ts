@@ -1,4 +1,4 @@
-import { Context, getRandomId } from "vk-io";
+import { getRandomId, MessageContext } from "vk-io";
 import { IBotContext } from "../context/context.interface";
 import { Command } from "./command.module";
 
@@ -7,7 +7,7 @@ export class TestCommand extends Command {
     super(bot);
   }
 
-  handle(context: Context): void {
+  handle(context: MessageContext): void {
     console.log(context);
 
     this.bot.api.messages.send({
