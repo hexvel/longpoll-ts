@@ -2,31 +2,35 @@ import { PrismaClient } from "@prisma/client";
 import { MessageContext, VK } from "vk-io";
 
 import { Command } from "./commands/command.module";
-import { TestCommand } from "./commands/test.command";
+import { PingCommand } from "./commands/ping.command";
 
-import { ConfigService } from "./config/config.service";
+import chalk from "chalk";
+import { FriendCommand } from "./commands/friends.command";
 import { IBotContext } from "./context/context.interface";
+import { UserFields, UserModel } from "./entities/user.model";
 
 export class Bot {
-  private ownerId: number = 0;
+  private readonly owner: UserFields;
   private readonly bot: IBotContext;
-  private readonly commands: Command[] = [];
+  public readonly commands: Map<string, Command> = new Map();
 
   constructor(
     private readonly prismaClient: PrismaClient,
-    private readonly vk: VK
+    private readonly user: UserModel
   ) {
-    this.bot = this.vk as IBotContext;
+    this.owner = this.user;
+    this.bot = new VK({ token: this.user.token }) as IBotContext;
     this.setupCommands();
   }
 
   private setupCommands() {
-    this.commands.push(new TestCommand(this.bot));
+    this.commands.set("пинг", new PingCommand(this.bot));
+    this.commands.set("тест", new FriendCommand(this.bot));
   }
 
   public async start() {
     try {
-      await this.setupHandlers();
+      this.bot.updates.on("message_new", this.handleNewMessage.bind(this));
       await this.prismaClient.$connect();
       await this.bot.updates.start();
     } catch (error) {
@@ -34,42 +38,56 @@ export class Bot {
     }
   }
 
-  private async setupHandlers() {
-    try {
-      const accountData = await this.bot.api.account.getProfileInfo();
-      this.ownerId = accountData.id;
-
-      this.bot.updates.on("message_new", this.handleNewMessage.bind(this));
-    } catch (error) {
-      console.error("Error setting up handlers:", error);
-    }
-  }
-
   private async handleNewMessage(context: MessageContext, next: () => void) {
     try {
-      if (context.senderId !== this.ownerId) return;
+      if (context.senderId !== this.owner.id) return;
 
       const messageText = context.text?.toLowerCase().trim();
+      const [prefix, command] = messageText?.split(" ") || [];
+      if (prefix !== this.owner.commandPrefix) return;
 
-      switch (messageText) {
-        case "test":
-          const command = this.commands.find(cmd => cmd instanceof TestCommand);
-          if (command) command.handle(context);
-          break;
-      }
+      const cmd = this.commands.get(command);
+      if (cmd) cmd.handle(context);
     } catch (error) {
       console.error("Error handling new message:", error);
     } finally {
-      return next();
+      next();
     }
   }
 }
 
-const configService = new ConfigService();
-const prismaClient = new PrismaClient();
-const vk = new VK({
-  token: configService.get("TOKEN"),
-});
+async function run() {
+  try {
+    const prismaClient = new PrismaClient();
 
-const bot = new Bot(prismaClient, vk);
-bot.start();
+    const usersData = await prismaClient.user.findMany();
+
+    for (const user of usersData) {
+      console.log(
+        chalk.yellow(
+          "Запуск юзера " + chalk.blue.underline.bold(user.id) + " ожидайте..."
+        )
+      );
+
+      const bot = new Bot(prismaClient, user);
+      await bot.start();
+
+      console.log(
+        chalk.green("Юзер " + chalk.cyan.underline.bold(user.id) + " запущен")
+      );
+      console.log(chalk.magenta("Зарегистрированные функции:"));
+
+      for (const command of bot.commands) {
+        console.log(chalk.gray(`\t-> ${command[0]}`));
+      }
+    }
+  } catch (error) {
+    console.error("Failed to start", error);
+    process.exit(1);
+  }
+}
+
+run().catch(error => {
+  console.error("Failed to start", error);
+  process.exit(1);
+});
