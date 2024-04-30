@@ -1,11 +1,10 @@
 import { PrismaClient } from "@prisma/client";
-import { MessageContext, VK } from "vk-io";
-
-import { Command } from "./commands/command.module";
-import { PingCommand } from "./commands/ping.command";
-
 import chalk from "chalk";
+import { MessageContext, VK } from "vk-io";
+import { BlackListCommand } from "./commands/blackList.command";
+import { Command } from "./commands/command.module";
 import { FriendCommand } from "./commands/friends.command";
+import { PingCommand } from "./commands/ping.command";
 import { IBotContext } from "./context/context.interface";
 import { UserFields, UserModel } from "./entities/user.model";
 
@@ -19,13 +18,22 @@ export class Bot {
     private readonly user: UserModel
   ) {
     this.owner = this.user;
+
     this.bot = new VK({ token: this.user.token }) as IBotContext;
+    this.bot.prisma = prismaClient;
+
     this.setupCommands();
   }
 
   private setupCommands() {
+    const friendCommand = new FriendCommand(this.bot);
+    const blackListCommand = new BlackListCommand(this.bot);
+
     this.commands.set("пинг", new PingCommand(this.bot));
-    this.commands.set("тест", new FriendCommand(this.bot));
+    this.commands.set("+др", friendCommand);
+    this.commands.set("-др", friendCommand);
+    this.commands.set("+чс", blackListCommand);
+    this.commands.set("-чс", blackListCommand);
   }
 
   public async start() {
@@ -35,6 +43,7 @@ export class Bot {
       await this.bot.updates.start();
     } catch (error) {
       console.error("Error starting bot:", error);
+      process.exit(1);
     }
   }
 
@@ -59,13 +68,12 @@ export class Bot {
 async function run() {
   try {
     const prismaClient = new PrismaClient();
-
     const usersData = await prismaClient.user.findMany();
 
-    for (const user of usersData) {
+    usersData.forEach(async user => {
       console.log(
         chalk.yellow(
-          "Запуск юзера " + chalk.blue.underline.bold(user.id) + " ожидайте..."
+          `Запуск юзера ${chalk.blue.underline.bold(user.id)} ожидайте...`
         )
       );
 
@@ -73,14 +81,14 @@ async function run() {
       await bot.start();
 
       console.log(
-        chalk.green("Юзер " + chalk.cyan.underline.bold(user.id) + " запущен")
+        chalk.green(`Юзер ${chalk.cyan.underline.bold(user.id)} запущен`)
       );
       console.log(chalk.magenta("Зарегистрированные функции:"));
 
-      for (const command of bot.commands) {
-        console.log(chalk.gray(`\t-> ${command[0]}`));
-      }
-    }
+      bot.commands.forEach((command, name) => {
+        console.log(chalk.gray(`\t-> ${name}`));
+      });
+    });
   } catch (error) {
     console.error("Failed to start", error);
     process.exit(1);

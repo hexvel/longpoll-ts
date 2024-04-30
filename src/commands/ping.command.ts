@@ -9,11 +9,17 @@ export class PingCommand extends Command {
   }
 
   handle(context: MessageContext): void {
+    const start = Date.now();
+    this.bot.prisma.user.findFirst({ where: { id: context.senderId } });
+    const end = Date.now();
+
     methods.editMessage(
       this.bot.api,
       context.peerId,
       context.id,
-      `🎂 PingTime: ${Date.now() - context.createdAt * 1000} ms.`
+      `🎂 Сообщения обработались за ${
+        Date.now() - context.createdAt * 1000
+      } мс | Скорость бд ${end - start}мс.`
     );
   }
 }
