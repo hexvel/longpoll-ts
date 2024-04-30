@@ -44,3 +44,9 @@ const prismaClient = new PrismaClient();
   bot.start();
 })();
 ```
+
+## Полезные ссылки
+
+- Документация [VK API](https://vk.com/dev/api)
+- Документация [VK-IO](https://negezor.github.io/vk-io/)
+- Моральная поддержка: [@Astra](https://t.me/oo_AsTpa_oo)
