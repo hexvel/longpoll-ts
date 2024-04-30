@@ -4,6 +4,7 @@ export interface IEditMessageContext {
   api: API;
   context: MessageContext;
   message: string;
+  attachments?: string;
   messageId?: number;
 }
 

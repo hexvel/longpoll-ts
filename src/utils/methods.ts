@@ -16,6 +16,7 @@ class VkMethods {
     await params.api.messages.edit({
       peer_id: params.context.peerId,
       message: params.message,
+      attachment: params.attachments,
       message_id: params.messageId || params.context.id,
       keep_forward_messages: true,
     });

@@ -11,6 +11,7 @@ import { IBotContext } from "./context/context.interface";
 import { UserModel } from "./entities/user.model";
 
 import { PrefixCommand } from "./commands/prefix.command";
+import { UserInfoCommand } from "./commands/userinfo.command";
 import { emojis } from "./utils/emojies";
 import { methods } from "./utils/methods";
 
@@ -53,6 +54,7 @@ class Bot {
     this.commands.set("+чс", blackListCommand);
     this.commands.set("-чс", blackListCommand);
     this.commands.set("префикс", new PrefixCommand(this.bot));
+    this.commands.set("инфо", new UserInfoCommand(this.bot));
   }
 
   /**
@@ -141,9 +143,9 @@ async function run(): Promise<void> {
         chalk.magenta(`${emojis.speechBalloon} Зарегистрированные функции:`)
       );
 
-      // bot.commands.forEach((command, name) => {
-      //   console.log(chalk.yellowBright(`\t${emojis.lightning} ${name}`));
-      // });
+      bot.commands.forEach((command, name) => {
+        console.log(chalk.yellowBright(`\t${emojis.lightning} ${name}`));
+      });
     });
   } catch (error) {
     console.error("Failed to start", error);
