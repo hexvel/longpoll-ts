@@ -18,6 +18,12 @@ class Bot {
   private readonly bot: IBotContext;
   public readonly commands: Map<string, Command> = new Map();
 
+  /**
+   * Constructs a new instance of the Bot class.
+   *
+   * @param {PrismaClient} prismaClient - The Prisma client instance.
+   * @param {UserModel} user - The user model instance.
+   */
   constructor(
     private readonly prismaClient: PrismaClient,
     private readonly user: UserModel
@@ -30,7 +36,15 @@ class Bot {
     this.setupCommands();
   }
 
-  private setupCommands() {
+  /**
+   * Sets up the commands for the bot.
+   *
+   * This function initializes the commands for the bot and maps them to their respective keys.
+   *
+   * @private
+   * @returns {void} This function does not return anything.
+   */
+  private setupCommands(): void {
     const friendsCommand = new FriendCommand(this.bot);
     const blackListCommand = new BlackListCommand(this.bot);
 
@@ -41,7 +55,13 @@ class Bot {
     this.commands.set("-чс", blackListCommand);
   }
 
-  public async start() {
+  /**
+   * Starts the bot by connecting to the Prisma client, setting up the message_new event listener,
+   * and starting the updates. If an error occurs during the process, it logs the error and exits the process.
+   *
+   * @return {Promise<void>} A promise that resolves when the bot has successfully started.
+   */
+  public async start(): Promise<void> {
     try {
       this.bot.updates.on("message_new", this.handleNewMessage.bind(this));
       await this.prismaClient.$connect();
@@ -52,6 +72,12 @@ class Bot {
     }
   }
 
+  /**
+   * Handles a new message by checking the sender, processing the command, and sending a response.
+   *
+   * @param {MessageContext} context - The message context containing information about the message.
+   * @param {() => void} next - The function to call to proceed to the next middleware.
+   */
   private async handleNewMessage(context: MessageContext, next: () => void) {
     try {
       if (context.senderId !== this.owner.id) return;
@@ -83,7 +109,14 @@ class Bot {
   }
 }
 
-async function run() {
+/**
+ * Runs the application by fetching user data from the Prisma client,
+ * creating a new bot instance for each user, starting the bot,
+ * and logging the successful start of each bot.
+ *
+ * @return {Promise<void>} A promise that resolves when all bots have successfully started.
+ */
+async function run(): Promise<void> {
   try {
     const prismaClient = new PrismaClient();
     const usersData = await prismaClient.user.findMany();
