@@ -10,9 +10,12 @@ export class PrefixCommand extends Command {
   }
 
   async handle(context: MessageContext): Promise<void> {
-    const splitText = context.text?.split(" ");
+    const { text } = context;
+    if (!text) return;
 
-    if (!splitText || splitText?.length < 3) {
+    const [_, __, prefixType, newPrefix] = text.split(" ");
+
+    if (!prefixType || !newPrefix) {
       return methods.editMessage({
         api: this.bot.api,
         context,
@@ -20,59 +23,46 @@ export class PrefixCommand extends Command {
       });
     }
 
-    const prefixType = splitText[2];
+    const prefixMap: { [key: string]: string } = {
+      команд: "commandPrefix",
+      скрипт: "scriptPrefix",
+      админ: "adminPrefix",
+    };
 
-    if (prefixType === "команда") {
-      await this.bot.prisma.user.update({
-        where: {
-          id: context.senderId,
-        },
-        data: {
-          commandPrefix: splitText[3],
-        },
-      });
-
-      this.bot.owner.commandPrefix = splitText[3];
-
+    const prefixField = prefixMap[prefixType];
+    if (!prefixField) {
       return methods.editMessage({
         api: this.bot.api,
         context,
-        message: `${emojis.success} Префикс команд ${prefixType} установлен на [${splitText[3]}].`,
-      });
-    } else if (prefixType === "скрипт") {
-      await this.bot.prisma.user.update({
-        where: {
-          id: context.senderId,
-        },
-        data: {
-          scriptPrefix: splitText[3],
-        },
-      });
-
-      this.bot.owner.scriptPrefix = splitText[3];
-
-      return methods.editMessage({
-        api: this.bot.api,
-        context,
-        message: `${emojis.success} Префикс скриптов ${prefixType} установлен на [${splitText[3]}].`,
-      });
-    } else if (prefixType === "админ") {
-      await this.bot.prisma.user.update({
-        where: {
-          id: context.senderId,
-        },
-        data: {
-          adminPrefix: splitText[3],
-        },
-      });
-
-      this.bot.owner.adminPrefix = splitText[3];
-
-      return methods.editMessage({
-        api: this.bot.api,
-        context,
-        message: `${emojis.success} Префикс админа ${prefixType} установлен на [${splitText[3]}].`,
+        message: `${emojis.warning} Указан некорректный тип префикса.`,
       });
     }
+
+    await this.bot.prisma.user.update({
+      where: {
+        id: context.senderId,
+      },
+      data: {
+        [prefixField]: newPrefix,
+      },
+    });
+
+    switch (prefixMap[prefixType]) {
+      case "commandPrefix":
+        this.bot.owner.commandPrefix = newPrefix;
+        break;
+      case "scriptPrefix":
+        this.bot.owner.scriptPrefix = newPrefix;
+        break;
+      case "adminPrefix":
+        this.bot.owner.adminPrefix = newPrefix;
+        break;
+    }
+
+    return methods.editMessage({
+      api: this.bot.api,
+      context,
+      message: `${emojis.success} Префикс ${prefixType} установлен на [${newPrefix}].`,
+    });
   }
 }
