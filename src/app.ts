@@ -1,14 +1,19 @@
 import { PrismaClient } from "@prisma/client";
 import chalk from "chalk";
 import { MessageContext, VK } from "vk-io";
+
 import { BlackListCommand } from "./commands/blackList.command";
 import { Command } from "./commands/command.module";
 import { FriendCommand } from "./commands/friends.command";
 import { PingCommand } from "./commands/ping.command";
+
 import { IBotContext } from "./context/context.interface";
 import { UserFields, UserModel } from "./entities/user.model";
 
-export class Bot {
+import { emojis } from "./utils/emojies";
+import { methods } from "./utils/methods";
+
+class Bot {
   private readonly owner: UserFields;
   private readonly bot: IBotContext;
   public readonly commands: Map<string, Command> = new Map();
@@ -26,12 +31,12 @@ export class Bot {
   }
 
   private setupCommands() {
-    const friendCommand = new FriendCommand(this.bot);
+    const friendsCommand = new FriendCommand(this.bot);
     const blackListCommand = new BlackListCommand(this.bot);
 
     this.commands.set("пинг", new PingCommand(this.bot));
-    this.commands.set("+др", friendCommand);
-    this.commands.set("-др", friendCommand);
+    this.commands.set("+др", friendsCommand);
+    this.commands.set("-др", friendsCommand);
     this.commands.set("+чс", blackListCommand);
     this.commands.set("-чс", blackListCommand);
   }
@@ -56,7 +61,20 @@ export class Bot {
       if (prefix !== this.owner.commandPrefix) return;
 
       const cmd = this.commands.get(command);
-      if (cmd) cmd.handle(context);
+      if (cmd) {
+        await cmd.handle(context);
+      } else {
+        await methods.editMessage(
+          this.bot.api,
+          context.peerId,
+          context.id,
+          `${
+            emojis.warning
+          } Неизвестная команда. Доступные команды: ${Array.from(
+            this.commands.keys()
+          ).join(", ")}`
+        );
+      }
     } catch (error) {
       console.error("Error handling new message:", error);
     } finally {
@@ -73,7 +91,9 @@ async function run() {
     usersData.forEach(async user => {
       console.log(
         chalk.yellow(
-          `Запуск юзера ${chalk.blue.underline.bold(user.id)} ожидайте...`
+          `${emojis.snowflake} Запуск юзера ${chalk.blue.underline.bold(
+            user.id
+          )} ожидайте`
         )
       );
 
@@ -81,13 +101,17 @@ async function run() {
       await bot.start();
 
       console.log(
-        chalk.green(`Юзер ${chalk.cyan.underline.bold(user.id)} запущен`)
+        chalk.green(
+          `${emojis.sparkle} Юзер ${chalk.cyan.underline.bold(user.id)} запущен`
+        )
       );
-      console.log(chalk.magenta("Зарегистрированные функции:"));
+      console.log(
+        chalk.magenta(`${emojis.speechBalloon} Зарегистрированные функции:`)
+      );
 
-      bot.commands.forEach((command, name) => {
-        console.log(chalk.gray(`\t-> ${name}`));
-      });
+      // bot.commands.forEach((command, name) => {
+      //   console.log(chalk.yellowBright(`\t${emojis.lightning} ${name}`));
+      // });
     });
   } catch (error) {
     console.error("Failed to start", error);
