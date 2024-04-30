@@ -92,8 +92,7 @@ class Bot {
       } else {
         await methods.editMessage(
           this.bot.api,
-          context.peerId,
-          context.id,
+          context,
           `${
             emojis.warning
           } Неизвестная команда. Доступные команды: ${Array.from(

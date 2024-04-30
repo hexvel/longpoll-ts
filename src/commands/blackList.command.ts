@@ -17,8 +17,7 @@ export class BlackListCommand extends Command {
     if (userId === context.senderId) {
       await methods.editMessage(
         this.bot.api,
-        context.peerId,
-        context.id,
+        context,
         `${emojis.warning} [id${userId}|Вы не можете заблокировать себя.]`
       );
       return;
@@ -30,8 +29,7 @@ export class BlackListCommand extends Command {
       if (add === 1) {
         await methods.editMessage(
           this.bot.api,
-          context.peerId,
-          context.id,
+          context,
           `${emojis.success} [id${userId}|Добавлен в чёрный список.]`
         );
         return;
@@ -39,8 +37,7 @@ export class BlackListCommand extends Command {
 
       await methods.editMessage(
         this.bot.api,
-        context.peerId,
-        context.id,
+        context,
         `${emojis.warning} [id${userId}|Не удалось добавить в чёрный список.]`
       );
       return;
@@ -50,8 +47,7 @@ export class BlackListCommand extends Command {
       if (remove === 1) {
         await methods.editMessage(
           this.bot.api,
-          context.peerId,
-          context.id,
+          context,
           `${emojis.success} [id${userId}|Исключён из чёрного списка.]`
         );
         return;
@@ -59,8 +55,7 @@ export class BlackListCommand extends Command {
 
       await methods.editMessage(
         this.bot.api,
-        context.peerId,
-        context.id,
+        context,
         `${emojis.warning} [id${userId}|Не удалось исключить из чёрного списка.]`
       );
       return;

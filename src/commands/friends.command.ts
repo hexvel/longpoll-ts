@@ -17,8 +17,7 @@ export class FriendCommand extends Command {
     if (userId === context.senderId) {
       await methods.editMessage(
         this.bot.api,
-        context.peerId,
-        context.id,
+        context,
         `${emojis.warning} [id${userId}|Нельзя добавить самого себя в друзья.]`
       );
       return;
@@ -30,8 +29,7 @@ export class FriendCommand extends Command {
       if ([1, 2, 4].includes(add)) {
         await methods.editMessage(
           this.bot.api,
-          context.peerId,
-          context.id,
+          context,
           `${emojis.success} [id${userId}|Добавлен в список друзей.]`
         );
         return;
@@ -39,8 +37,7 @@ export class FriendCommand extends Command {
 
       await methods.editMessage(
         this.bot.api,
-        context.peerId,
-        context.id,
+        context,
         `${emojis.warning} [id${userId}|Не удалось добавить в список друзей.]`
       );
       return;
@@ -50,8 +47,7 @@ export class FriendCommand extends Command {
       if (remove.success || remove.friend_deleted) {
         await methods.editMessage(
           this.bot.api,
-          context.peerId,
-          context.id,
+          context,
           `${emojis.success} [id${userId}|Удалён из списка друзей.]`
         );
         return;
@@ -60,16 +56,14 @@ export class FriendCommand extends Command {
       if (remove.in_request_deleted) {
         await methods.editMessage(
           this.bot.api,
-          context.peerId,
-          context.id,
+          context,
           `${emojis.warning} [id${userId}|Отклонена входящая заявка в друзья.]`
         );
         return;
       } else if (remove.out_request_deleted) {
         await methods.editMessage(
           this.bot.api,
-          context.peerId,
-          context.id,
+          context,
           `${emojis.warning} [id${userId}|Отменена исходящая заявка в друзья.]`
         );
         return;
@@ -77,8 +71,7 @@ export class FriendCommand extends Command {
 
       await methods.editMessage(
         this.bot.api,
-        context.peerId,
-        context.id,
+        context,
         `${emojis.warning} [id${userId}|Не удалось удалить из списка друзей.]`
       );
       return;
