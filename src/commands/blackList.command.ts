@@ -15,11 +15,11 @@ export class BlackListCommand extends Command {
     const userId = await helpers.resolveResourceId(this.bot.api, context);
 
     if (userId === context.senderId) {
-      await methods.editMessage(
-        this.bot.api,
+      await methods.editMessage({
+        api: this.bot.api,
         context,
-        `${emojis.warning} [id${userId}|Вы не можете заблокировать себя.]`
-      );
+        message: `${emojis.warning} [id${userId}|Вы не можете заблокировать себя.]`,
+      });
       return;
     }
 
@@ -27,37 +27,37 @@ export class BlackListCommand extends Command {
       const add = await this.bot.api.account.ban({ owner_id: userId });
 
       if (add === 1) {
-        await methods.editMessage(
-          this.bot.api,
+        await methods.editMessage({
+          api: this.bot.api,
           context,
-          `${emojis.success} [id${userId}|Добавлен в чёрный список.]`
-        );
+          message: `${emojis.success} [id${userId}|Добавлен в чёрный список.]`,
+        });
         return;
       }
 
-      await methods.editMessage(
-        this.bot.api,
+      await methods.editMessage({
+        api: this.bot.api,
         context,
-        `${emojis.warning} [id${userId}|Не удалось добавить в чёрный список.]`
-      );
+        message: `${emojis.warning} [id${userId}|Не удалось добавить в чёрный список.]`,
+      });
       return;
     } else if (action === "-чс") {
       const remove = await this.bot.api.account.unban({ owner_id: userId });
 
       if (remove === 1) {
-        await methods.editMessage(
-          this.bot.api,
+        await methods.editMessage({
+          api: this.bot.api,
           context,
-          `${emojis.success} [id${userId}|Исключён из чёрного списка.]`
-        );
+          message: `${emojis.success} [id${userId}|Исключён из чёрного списка.]`,
+        });
         return;
       }
 
-      await methods.editMessage(
-        this.bot.api,
+      await methods.editMessage({
+        api: this.bot.api,
         context,
-        `${emojis.warning} [id${userId}|Не удалось исключить из чёрного списка.]`
-      );
+        message: `${emojis.warning} [id${userId}|Не удалось исключить из чёрного списка.]`,
+      });
       return;
     }
   }

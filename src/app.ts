@@ -8,13 +8,13 @@ import { FriendCommand } from "./commands/friends.command";
 import { PingCommand } from "./commands/ping.command";
 
 import { IBotContext } from "./context/context.interface";
-import { UserFields, UserModel } from "./entities/user.model";
+import { UserModel } from "./entities/user.model";
 
+import { PrefixCommand } from "./commands/prefix.command";
 import { emojis } from "./utils/emojies";
 import { methods } from "./utils/methods";
 
 class Bot {
-  private readonly owner: UserFields;
   private readonly bot: IBotContext;
   public readonly commands: Map<string, Command> = new Map();
 
@@ -28,10 +28,9 @@ class Bot {
     private readonly prismaClient: PrismaClient,
     private readonly user: UserModel
   ) {
-    this.owner = this.user;
-
     this.bot = new VK({ token: this.user.token }) as IBotContext;
     this.bot.prisma = prismaClient;
+    this.bot.owner = user;
 
     this.setupCommands();
   }
@@ -53,6 +52,7 @@ class Bot {
     this.commands.set("-др", friendsCommand);
     this.commands.set("+чс", blackListCommand);
     this.commands.set("-чс", blackListCommand);
+    this.commands.set("префикс", new PrefixCommand(this.bot));
   }
 
   /**
@@ -80,25 +80,25 @@ class Bot {
    */
   private async handleNewMessage(context: MessageContext, next: () => void) {
     try {
-      if (context.senderId !== this.owner.id) return;
+      if (context.senderId !== this.bot.owner.id) return;
 
       const messageText = context.text?.toLowerCase().trim();
       const [prefix, command] = messageText?.split(" ") || [];
-      if (prefix !== this.owner.commandPrefix) return;
+      if (prefix !== this.bot.owner.commandPrefix) return;
 
       const cmd = this.commands.get(command);
       if (cmd) {
         await cmd.handle(context);
       } else {
-        await methods.editMessage(
-          this.bot.api,
+        await methods.editMessage({
+          api: this.bot.api,
           context,
-          `${
+          message: `${
             emojis.warning
           } Неизвестная команда. Доступные команды: ${Array.from(
             this.commands.keys()
-          ).join(", ")}`
-        );
+          ).join(", ")}`,
+        });
       }
     } catch (error) {
       console.error("Error handling new message:", error);

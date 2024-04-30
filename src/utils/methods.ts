@@ -1,23 +1,22 @@
-import { API, getRandomId, MessageContext } from "vk-io";
+import { getRandomId } from "vk-io";
+import {
+  IEditMessageContext,
+  ISendMessageContext,
+} from "../entities/context.model";
 
 class VkMethods {
-  async sendMessage(api: API, context: MessageContext, message: string) {
-    await api.messages.send({
-      peer_id: context.peerId,
-      message: message,
+  async sendMessage(params: ISendMessageContext) {
+    await params.api.messages.send({
+      peer_id: params.context.peerId,
+      message: params.message,
       random_id: getRandomId(),
     });
   }
-  async editMessage(
-    api: API,
-    context: MessageContext,
-    message: string,
-    messageId?: number
-  ) {
-    await api.messages.edit({
-      peer_id: context.peerId,
-      message: message,
-      message_id: messageId || context.id,
+  async editMessage(params: IEditMessageContext) {
+    await params.api.messages.edit({
+      peer_id: params.context.peerId,
+      message: params.message,
+      message_id: params.messageId || params.context.id,
       keep_forward_messages: true,
     });
   }

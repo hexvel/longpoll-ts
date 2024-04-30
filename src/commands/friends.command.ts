@@ -15,11 +15,11 @@ export class FriendCommand extends Command {
     const userId = await helpers.resolveResourceId(this.bot.api, context);
 
     if (userId === context.senderId) {
-      await methods.editMessage(
-        this.bot.api,
+      await methods.editMessage({
+        api: this.bot.api,
         context,
-        `${emojis.warning} [id${userId}|Нельзя добавить самого себя в друзья.]`
-      );
+        message: `${emojis.warning} [id${userId}|Нельзя добавить самого себя в друзья.]`,
+      });
       return;
     }
 
@@ -27,53 +27,53 @@ export class FriendCommand extends Command {
       const add = await this.bot.api.friends.add({ user_id: userId });
 
       if ([1, 2, 4].includes(add)) {
-        await methods.editMessage(
-          this.bot.api,
+        await methods.editMessage({
+          api: this.bot.api,
           context,
-          `${emojis.success} [id${userId}|Добавлен в список друзей.]`
-        );
+          message: `${emojis.success} [id${userId}|Добавлен в список друзей.]`,
+        });
         return;
       }
 
-      await methods.editMessage(
-        this.bot.api,
+      await methods.editMessage({
+        api: this.bot.api,
         context,
-        `${emojis.warning} [id${userId}|Не удалось добавить в список друзей.]`
-      );
+        message: `${emojis.warning} [id${userId}|Не удалось добавить в список друзей.]`,
+      });
       return;
     } else if (action === "-др") {
       const remove = await this.bot.api.friends.delete({ user_id: userId });
 
       if (remove.success || remove.friend_deleted) {
-        await methods.editMessage(
-          this.bot.api,
+        await methods.editMessage({
+          api: this.bot.api,
           context,
-          `${emojis.success} [id${userId}|Удалён из списка друзей.]`
-        );
+          message: `${emojis.success} [id${userId}|Удалён из списка друзей.]`,
+        });
         return;
       }
 
       if (remove.in_request_deleted) {
-        await methods.editMessage(
-          this.bot.api,
+        await methods.editMessage({
+          api: this.bot.api,
           context,
-          `${emojis.warning} [id${userId}|Отклонена входящая заявка в друзья.]`
-        );
+          message: `${emojis.warning} [id${userId}|Отклонена входящая заявка в друзья.]`,
+        });
         return;
       } else if (remove.out_request_deleted) {
-        await methods.editMessage(
-          this.bot.api,
+        await methods.editMessage({
+          api: this.bot.api,
           context,
-          `${emojis.warning} [id${userId}|Отменена исходящая заявка в друзья.]`
-        );
+          message: `${emojis.warning} [id${userId}|Отменена исходящая заявка в друзья.]`,
+        });
         return;
       }
 
-      await methods.editMessage(
-        this.bot.api,
+      await methods.editMessage({
+        api: this.bot.api,
         context,
-        `${emojis.warning} [id${userId}|Не удалось удалить из списка друзей.]`
-      );
+        message: `${emojis.warning} [id${userId}|Не удалось удалить из списка друзей.]`,
+      });
       return;
     }
   }

@@ -13,12 +13,12 @@ export class PingCommand extends Command {
     this.bot.prisma.user.findFirst({ where: { id: context.senderId } });
     const end = Date.now();
 
-    methods.editMessage(
-      this.bot.api,
+    methods.editMessage({
+      api: this.bot.api,
       context,
-      `🎂 Сообщения обработались за ${
+      message: `🎂 Сообщения обработались за ${
         Date.now() - context.createdAt * 1000
-      } мс | Скорость бд ${end - start}мс.`
-    );
+      } мс | Скорость бд ${end - start}мс.`,
+    });
   }
 }
