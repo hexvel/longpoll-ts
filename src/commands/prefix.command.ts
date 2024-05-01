@@ -24,9 +24,9 @@ export class PrefixCommand extends Command {
     }
 
     const prefixMap: { [key: string]: string } = {
-      команд: "commandPrefix",
-      скрипт: "scriptPrefix",
-      админ: "adminPrefix",
+      команд: "command",
+      скрипт: "script",
+      админ: "admin",
     };
 
     const prefixField = prefixMap[prefixType];
@@ -38,25 +38,27 @@ export class PrefixCommand extends Command {
       });
     }
 
-    await this.bot.prisma.user.update({
+    await this.bot.prisma.prefix.update({
       where: {
-        id: context.senderId,
+        userId: context.senderId,
       },
       data: {
         [prefixField]: newPrefix,
       },
     });
 
-    switch (prefixMap[prefixType]) {
-      case "commandPrefix":
-        this.bot.owner.commandPrefix = newPrefix;
-        break;
-      case "scriptPrefix":
-        this.bot.owner.scriptPrefix = newPrefix;
-        break;
-      case "adminPrefix":
-        this.bot.owner.adminPrefix = newPrefix;
-        break;
+    if (this.bot.owner.prefix) {
+      switch (prefixMap[prefixType]) {
+        case "command":
+          this.bot.owner.prefix.command = newPrefix;
+          break;
+        case "script":
+          this.bot.owner.prefix.script = newPrefix;
+          break;
+        case "admin":
+          this.bot.owner.prefix.admin = newPrefix;
+          break;
+      }
     }
 
     return methods.editMessage({

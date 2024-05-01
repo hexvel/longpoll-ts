@@ -29,9 +29,11 @@ export class UserInfoCommand extends Command {
     ${emojis.inboxTray} Сквад: ${this.bot.owner.squad}
 
     ${emojis.key} Информация и префиксах:
-    ${emojis.globeWithMeridians} Префикс команд: ${this.bot.owner.commandPrefix}
-    ${emojis.cloud} Префикс скриптов: ${this.bot.owner.scriptPrefix}
-    ${emojis.bomb} Префикс админки: ${this.bot.owner.adminPrefix}
+    ${emojis.globeWithMeridians} Префикс команд: ${
+      this.bot.owner.prefix?.command
+    }
+    ${emojis.cloud} Префикс скриптов: ${this.bot.owner.prefix?.script}
+    ${emojis.bomb} Префикс админки: ${this.bot.owner.prefix?.admin}
     `;
 
     methods.editMessage({

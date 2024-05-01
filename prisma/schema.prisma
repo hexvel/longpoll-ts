@@ -14,14 +14,21 @@ datasource db {
 }
 
 model User {
-  id            Int    @id @unique
-  rank          Int    @default(1)
-  token         String @db.Text()
-  username      String @default("UserName")
-  squad         String @default("hexvel")
-  cover_image   String @default("photo-224389197_457239529")
-  commandPrefix String @default(".н") @map("command_prefix")
-  scriptPrefix  String @default(".нс") @map("script_prefix")
-  adminPrefix   String @default(".на") @map("admin_prefix")
-  list          Json   @default("{\"ignore\": [], \"trust\": []}")
+  id          Int     @id @unique
+  rank        Int     @default(1)
+  token       String  @db.Text()
+  username    String  @default("UserName")
+  squad       String  @default("hexvel")
+  cover_image String  @default("photo-224389197_457239529")
+  list        Json    @default("{\"ignore\": [], \"trust\": []}")
+  prefix      Prefix?
+}
+
+model Prefix {
+  id      Int    @id
+  command String @default(".н")
+  script  String @default(".нс")
+  admin   String @default(".на")
+  user    User?  @relation(fields: [userId], references: [id])
+  userId  Int    @unique
 }

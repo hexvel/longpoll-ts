@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import chalk from "chalk";
 import { MessageContext, VK } from "vk-io";
 
 import { BlackListCommand } from "./commands/blackList.command";
@@ -10,6 +9,7 @@ import { PingCommand } from "./commands/ping.command";
 import { IBotContext } from "./context/context.interface";
 import { UserModel } from "./entities/user.model";
 
+import chalk from "chalk";
 import { PrefixCommand } from "./commands/prefix.command";
 import { UserInfoCommand } from "./commands/userinfo.command";
 import { emojis } from "./utils/emojies";
@@ -85,8 +85,10 @@ class Bot {
       if (context.senderId !== this.bot.owner.id) return;
 
       const messageText = context.text?.toLowerCase().trim();
+
       const [prefix, command] = messageText?.split(" ") || [];
-      if (prefix !== this.bot.owner.commandPrefix) return;
+
+      if (prefix !== this.bot.owner.prefix?.command) return;
 
       const cmd = this.commands.get(command);
       if (cmd) {
@@ -120,7 +122,10 @@ class Bot {
 async function run(): Promise<void> {
   try {
     const prismaClient = new PrismaClient();
-    const usersData = await prismaClient.user.findMany();
+
+    const usersData = await prismaClient.user.findMany({
+      include: { prefix: true },
+    });
 
     usersData.forEach(async user => {
       console.log(
@@ -143,9 +148,9 @@ async function run(): Promise<void> {
         chalk.magenta(`${emojis.speechBalloon} Зарегистрированные функции:`)
       );
 
-      bot.commands.forEach((command, name) => {
+      for (const [name] of bot.commands.entries()) {
         console.log(chalk.yellowBright(`\t${emojis.lightning} ${name}`));
-      });
+      }
     });
   } catch (error) {
     console.error("Failed to start", error);
