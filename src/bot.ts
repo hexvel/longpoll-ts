@@ -134,29 +134,23 @@ export class Bot {
    * @param {MessageContext} context - The context of the incoming message.
    * @return {Promise<void>} A promise that resolves when the check is complete.
    */
+
   private async checkTrustUsers(context: MessageContext): Promise<void> {
     const { trust } = helpers.parsePrismaJSON<IList>(
       this.bot.owner.list as unknown as IList,
-      /**
-       * Handles a new user message.
-       *
-       * @param {MessageContext} context - The context of the message.
-       * @return {Promise<void>} A promise that resolves when the message is handled.
-       */
       "trust"
     );
-    /**
-     * Handle a new message from a user.
-     *
-     * @param {MessageContext} context - The message context containing user information.
-     * @return {Promise<void>} A promise that resolves once the message is handled.
-     */
 
     if (context.text?.startsWith("#") && trust.includes(context.senderId)) {
       await context.send(context.text.replace("#", ""));
     }
   }
-
+  /**
+   * Handles a new user message by checking the prefix and command, and executing the corresponding handler.
+   *
+   * @param {MessageContext} context - The context of the message.
+   * @return {Promise<void>} A promise that resolves when the message is handled.
+   */
   private async handleUserNewMessage(context: MessageContext): Promise<void> {
     const [prefix, command] = context.text?.split(" ") || [];
 
@@ -173,6 +167,12 @@ export class Bot {
     }
   }
 
+  /**
+   * Handles a new admin message by checking the prefix and command, and executing the corresponding handler.
+   *
+   * @param {MessageContext} context - The context of the message.
+   * @return {Promise<void>} A promise that resolves when the message is handled.
+   */
   private async handleAdminNewMessage(context: MessageContext): Promise<void> {
     const [prefix, command] = context.text?.split(" ") || [];
 
