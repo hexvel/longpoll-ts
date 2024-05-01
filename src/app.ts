@@ -1,10 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import chalk from "chalk";
 import { VK } from "vk-io";
-
 import { Bot } from "./bot";
-
-import pingCommand from "./commands/user/ping.command";
 
 import ignoreCommand from "./commands/arrays/ignore.command";
 import ignoresCommand from "./commands/arrays/ignores.command";
@@ -12,9 +9,11 @@ import trustCommand from "./commands/arrays/trust.command";
 import trustsCommand from "./commands/arrays/trusts.command";
 import blackListCommand from "./commands/user/blackList.command";
 import friendsCommand from "./commands/user/friends.command";
+import pingCommand from "./commands/user/ping.command";
 import prefixCommand from "./commands/user/prefix.command";
 import userinfoCommand from "./commands/user/userinfo.command";
 import usernameCommand from "./commands/user/username.command";
+
 import { IBotContext } from "./context/context.interface";
 import { UserModel } from "./entities/user.model";
 
@@ -22,11 +21,23 @@ export class BotApp {
   private readonly prismaClient: PrismaClient;
   private readonly users: UserModel[];
 
+  /**
+   * Initializes a new instance of the class.
+   *
+   * @param {PrismaClient} prismaClient - The Prisma client.
+   * @param {UserModel[]} users - An array of UserModel objects.
+   */
   constructor(prismaClient: PrismaClient, users: UserModel[]) {
     this.prismaClient = prismaClient;
     this.users = users;
   }
 
+  /**
+   * Runs the bot for each user in the users array,
+   * creating a new bot for each user and starting it.
+   *
+   * @return {Promise<void>} A promise that resolves once all bots have been started.
+   */
   public async run(): Promise<void> {
     for (const user of this.users) {
       console.log(
@@ -48,6 +59,12 @@ export class BotApp {
     }
   }
 
+  /**
+   * Creates a new Bot instance for the given UserModel.
+   *
+   * @param {UserModel} user - The UserModel for which the Bot instance is created.
+   * @return {Bot} The newly created Bot instance.
+   */
   private createBot(user: UserModel): Bot {
     const botContext = new VK({ token: user.token }) as IBotContext;
     const bot = new Bot(botContext, user, this.prismaClient);
@@ -57,6 +74,12 @@ export class BotApp {
     return bot;
   }
 
+  /**
+   * Sets up commands for the provided bot.
+   *
+   * @param {Bot} bot - The bot instance to set up commands for.
+   * @return {void} This function does not return anything.
+   */
   private setupCommands(bot: Bot): void {
     bot.registerCommand(pingCommand.pattern, pingCommand.handler);
     bot.registerCommand(friendsCommand.pattern, friendsCommand.handler);
