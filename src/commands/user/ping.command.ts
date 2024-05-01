@@ -7,12 +7,13 @@ export default new Command({
   description: "вывод пинга",
 
   async handler(context, bot) {
+    const now = Date.now();
+    const ping = now - context.createdAt * 1000;
+
     methods.editMessage({
       api: bot.api,
       context,
-      message: `🎂 Сообщения обработались за ${
-        Date.now() - context.createdAt * 1000
-      }мс.`,
+      message: `🎂 Сообщения обработались за ${ping % 1000}мс.`,
     });
   },
 });
