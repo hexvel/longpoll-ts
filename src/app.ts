@@ -12,6 +12,8 @@ import { UserModel } from "./entities/user.model";
 import chalk from "chalk";
 import { RegistrationCommand } from "./commands/admin/registration.command";
 import { PrefixCommand } from "./commands/user/prefix.command";
+import { TrustListCommand } from "./commands/user/trust.command";
+import { TrustsListCommand } from "./commands/user/trusts.command";
 import { UserInfoCommand } from "./commands/user/userinfo.command";
 import { UsernameCommand } from "./commands/user/username.command";
 import { emojis } from "./utils/emojies";
@@ -61,13 +63,18 @@ export class Bot {
     const blackListCommand = new BlackListCommand(this.bot);
 
     this.commands.set("пинг", new PingCommand(this.bot));
+
     this.commands.set("+др", friendsCommand);
     this.commands.set("-др", friendsCommand);
     this.commands.set("+чс", blackListCommand);
     this.commands.set("-чс", blackListCommand);
+
     this.commands.set("префикс", new PrefixCommand(this.bot));
     this.commands.set("инфо", new UserInfoCommand(this.bot));
     this.commands.set("ник", new UsernameCommand(this.bot));
+
+    this.commands.set("дов", new TrustListCommand(this.bot));
+    this.commands.set("довы", new TrustsListCommand(this.bot));
   }
 
   /**

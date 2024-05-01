@@ -19,4 +19,9 @@ export interface UserModel {
   list: Prisma.JsonValue;
 }
 
+export interface IList {
+  trust: number[];
+  ignore: number[];
+}
+
 export interface UserFields extends Omit<UserModel, "token"> {}

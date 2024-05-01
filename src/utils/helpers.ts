@@ -19,6 +19,14 @@ class Helpers {
       ? -resolvedResource.id
       : resolvedResource.id;
   }
+
+  parsePrismaJSON<T>(obj: T, key?: string): T {
+    if (typeof obj === "object" && obj !== null && key && key in obj) {
+      return obj;
+    }
+
+    return JSON.parse(JSON.stringify(obj));
+  }
 }
 
 export const helpers = new Helpers();
