@@ -7,16 +7,19 @@ import { FriendCommand } from "./commands/user/friends.command";
 import { PingCommand } from "./commands/user/ping.command";
 
 import { IBotContext } from "./context/context.interface";
-import { UserModel } from "./entities/user.model";
+import { IList, UserModel } from "./entities/user.model";
 
 import chalk from "chalk";
 import { RegistrationCommand } from "./commands/admin/registration.command";
+import { IgnoreListCommand } from "./commands/user/arrays/ignore.command";
+import { IgnoresListCommand } from "./commands/user/arrays/ignores.command";
+import { TrustListCommand } from "./commands/user/arrays/trust.command";
+import { TrustsListCommand } from "./commands/user/arrays/trusts.command";
 import { PrefixCommand } from "./commands/user/prefix.command";
-import { TrustListCommand } from "./commands/user/trust.command";
-import { TrustsListCommand } from "./commands/user/trusts.command";
 import { UserInfoCommand } from "./commands/user/userinfo.command";
 import { UsernameCommand } from "./commands/user/username.command";
 import { emojis } from "./utils/emojies";
+import { helpers } from "./utils/helpers";
 import { methods } from "./utils/methods";
 
 export class Bot {
@@ -75,6 +78,9 @@ export class Bot {
 
     this.commands.set("дов", new TrustListCommand(this.bot));
     this.commands.set("довы", new TrustsListCommand(this.bot));
+
+    this.commands.set("игнор", new IgnoreListCommand(this.bot));
+    this.commands.set("игноры", new IgnoresListCommand(this.bot));
   }
 
   /**
@@ -119,6 +125,43 @@ export class Bot {
   }
 
   /**
+   * Checks if the user sending the message is in the ignore list and deletes the message if so.
+   *
+   * @param {MessageContext} context - The context of the message being checked.
+   * @return {Promise<void>} A promise that resolves when the check is complete.
+   */
+  private async checkIgnoreUsers(context: MessageContext): Promise<void> {
+    const { ignore } = helpers.parsePrismaJSON<IList>(
+      this.bot.owner.list as unknown as IList,
+      "ignore"
+    );
+
+    if (ignore.includes(context.senderId)) {
+      await this.bot.api.messages.delete({
+        cmids: context.conversationMessageId,
+      });
+    }
+  }
+
+  /**
+   * Checks if the user sending the message is in the trust list and if the message starts with "#".
+   * If both conditions are met, it sends the message without the "#" symbol.
+   *
+   * @param {MessageContext} context - The context of the message being checked.
+   * @return {Promise<void>} A promise that resolves when the check is complete.
+   */
+  private async checkTrustUsers(context: MessageContext): Promise<void> {
+    const { trust } = helpers.parsePrismaJSON<IList>(
+      this.bot.owner.list as unknown as IList,
+      "trust"
+    );
+
+    if (context.text?.startsWith("#") && trust.includes(context.senderId)) {
+      await context.send(context.text.replace("#", ""));
+    }
+  }
+
+  /**
    * Handles a new message by checking the sender, processing the command, and sending a response.
    *
    * @param {MessageContext} context - The message context containing information about the message.
@@ -129,6 +172,11 @@ export class Bot {
     next: () => void
   ) {
     try {
+      await context.loadMessagePayload();
+
+      await this.checkIgnoreUsers(context);
+      await this.checkTrustUsers(context);
+
       if (context.senderId !== this.bot.owner.id) return;
 
       const messageText = context.text?.toLowerCase().trim();
