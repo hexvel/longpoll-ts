@@ -1,3 +1,4 @@
+import { emojis } from "../../utils/emojies";
 import { methods } from "../../utils/methods";
 import { Command } from "../command.module";
 
@@ -7,13 +8,23 @@ export default new Command({
   description: "вывод пинга",
 
   async handler(context, bot) {
-    const now = Date.now();
-    const ping = now - context.createdAt * 1000;
+    const nowInMillis = Date.now();
+
+    await bot.prisma.user.findFirst({});
+    const dbLatency = Date.now() - nowInMillis;
+
+    const apiStart = Date.now();
+    await methods.editMessage({
+      api: bot.api,
+      context,
+      message: `${emojis.sparkle} Измерение времени API`,
+    });
+    const apiLatency = Date.now() - apiStart;
 
     methods.editMessage({
       api: bot.api,
       context,
-      message: `🎂 Сообщения обработались за ${ping % 1000}мс.`,
+      message: `🎂 API: ${apiLatency} ms | DB took: ${dbLatency} ms`,
     });
   },
 });
