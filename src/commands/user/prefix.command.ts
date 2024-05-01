@@ -16,11 +16,13 @@ export class PrefixCommand extends Command {
     const [_, __, prefixType, newPrefix] = text.split(" ");
 
     if (!prefixType || !newPrefix) {
-      return methods.editMessage({
+      await methods.editMessage({
         api: this.bot.api,
         context,
         message: `${emojis.warning} Не указан префикс. Пример: .н префикс <тип префикса> <новый префикс>`,
       });
+
+      return;
     }
 
     const prefixMap: { [key: string]: string } = {
@@ -31,11 +33,13 @@ export class PrefixCommand extends Command {
 
     const prefixField = prefixMap[prefixType];
     if (!prefixField) {
-      return methods.editMessage({
+      await methods.editMessage({
         api: this.bot.api,
         context,
         message: `${emojis.warning} Указан некорректный тип префикса.`,
       });
+
+      return;
     }
 
     await this.bot.prisma.prefix.update({
@@ -61,7 +65,7 @@ export class PrefixCommand extends Command {
       }
     }
 
-    return methods.editMessage({
+    await methods.editMessage({
       api: this.bot.api,
       context,
       message: `${emojis.success} Префикс ${prefixType} установлен на [${newPrefix}].`,

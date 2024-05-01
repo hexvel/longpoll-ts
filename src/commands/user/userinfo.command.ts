@@ -46,7 +46,7 @@ ${emojis.heart} Никнейм: ${userData.username}
 ${emojis.id} ID: ${userData.id}
 ${emojis.inboxTray} Сквад: ${userData.squad}
 
-${emojis.key} Информация и префиксах:
+${emojis.key} Информация о префиксах:
 ${emojis.globeWithMeridians} Префикс команд: ${userData.prefix?.command}
 ${emojis.cloud} Префикс скриптов: ${userData.prefix?.script}
 ${emojis.bomb} Префикс админки: ${userData.prefix?.admin}
