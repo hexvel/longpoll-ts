@@ -1,22 +1,20 @@
 import chalk from "chalk";
-import { MessageContext } from "vk-io";
-import { Bot } from "../../app";
-import { IBotContext } from "../../context/context.interface";
+import { Bot } from "../../bot";
 import { emojis } from "../../utils/emojies";
 import { methods } from "../../utils/methods";
 import { Command } from "../command.module";
 
-export class RegistrationCommand extends Command {
-  constructor(bot: IBotContext) {
-    super(bot);
-  }
+export default new Command({
+  pattern: /^(?:рег|reg)$/i,
+  name: "рег",
+  description: "Регистрация нового пользователя",
 
-  async handle(context: MessageContext): Promise<void> {
+  async handler(context, bot) {
     await context.loadMessagePayload();
 
     if (!context.replyMessage || !context.replyMessage.text) {
       await methods.editMessage({
-        api: this.bot.api,
+        api: bot.api,
         context,
         message: `${emojis.warning} Нужно ответить на сообщение с токеном.`,
       });
@@ -26,7 +24,7 @@ export class RegistrationCommand extends Command {
 
     const { senderId: userId, text: token } = context.replyMessage;
 
-    const user = await this.bot.prisma.user.findUnique({
+    const user = await bot.prisma.user.findUnique({
       where: {
         id: userId,
       },
@@ -34,7 +32,7 @@ export class RegistrationCommand extends Command {
 
     if (user) {
       await methods.editMessage({
-        api: this.bot.api,
+        api: bot.api,
         context,
         message: `${emojis.warning} [id${userId}|Пользователь уже зарегистрирован.]`,
       });
@@ -43,7 +41,7 @@ export class RegistrationCommand extends Command {
 
     if (token.length < 80) {
       await methods.editMessage({
-        api: this.bot.api,
+        api: bot.api,
         context,
         message: `${emojis.warning} [id${userId}|Укажите токен.]`,
       });
@@ -54,14 +52,14 @@ export class RegistrationCommand extends Command {
 
     if (!chekedToken) {
       await methods.editMessage({
-        api: this.bot.api,
+        api: bot.api,
         context,
         message: `${emojis.warning} [id${userId}|Некорректный токен.]`,
       });
       return;
     }
 
-    const newUser = await this.bot.prisma.user.create({
+    const newUser = await bot.prisma.user.create({
       data: {
         id: userId,
         token,
@@ -76,8 +74,8 @@ export class RegistrationCommand extends Command {
       },
     });
 
-    const bot = new Bot(this.bot.prisma, newUser);
-    await bot.start();
+    const botObj = new Bot(bot, newUser, bot.prisma);
+    await botObj.start();
 
     console.log(
       chalk.green(
@@ -86,9 +84,9 @@ export class RegistrationCommand extends Command {
     );
 
     await methods.editMessage({
-      api: this.bot.api,
+      api: bot.api,
       context,
       message: `${emojis.success} [id${userId}|Пользователь успешно зарегистрирован.]`,
     });
-  }
-}
+  },
+});

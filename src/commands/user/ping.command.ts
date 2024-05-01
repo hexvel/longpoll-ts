@@ -1,24 +1,18 @@
-import { MessageContext } from "vk-io";
-import { IBotContext } from "../../context/context.interface";
 import { methods } from "../../utils/methods";
 import { Command } from "../command.module";
 
-export class PingCommand extends Command {
-  constructor(bot: IBotContext) {
-    super(bot);
-  }
+export default new Command({
+  pattern: /^(?:пинг|ping)$/i,
+  name: "пинг",
+  description: "вывод пинга",
 
-  async handle(context: MessageContext): Promise<void> {
-    const start = Date.now();
-    this.bot.prisma.user.findFirst({ where: { id: context.senderId } });
-    const end = Date.now();
-
+  async handler(context, bot) {
     methods.editMessage({
-      api: this.bot.api,
+      api: bot.api,
       context,
       message: `🎂 Сообщения обработались за ${
         Date.now() - context.createdAt * 1000
-      } мс | Скорость бд ${end - start}мс.`,
+      }мс.`,
     });
-  }
-}
+  },
+});

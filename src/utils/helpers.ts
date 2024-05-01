@@ -1,4 +1,6 @@
 import { API, MessageContext, resolveResource } from "vk-io";
+import { IBotContext } from "../context/context.interface";
+import { IList } from "../entities/user.model";
 
 class Helpers {
   async resolveResourceId(api: API, context: MessageContext): Promise<number> {
@@ -26,6 +28,30 @@ class Helpers {
     }
 
     return JSON.parse(JSON.stringify(obj));
+  }
+
+  async updateUserList(
+    bot: IBotContext,
+    senderId: number,
+    newData: IList
+  ): Promise<void> {
+    try {
+      await bot.prisma.user.update({
+        where: {
+          id: senderId,
+        },
+        data: {
+          list: {
+            ...newData,
+          },
+        },
+      });
+    } catch (error) {
+      console.error(
+        "Ошибка при обновлении списка игнорируемых пользователей:",
+        error
+      );
+    }
   }
 }
 

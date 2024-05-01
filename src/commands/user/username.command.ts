@@ -1,15 +1,13 @@
-import { MessageContext } from "vk-io";
-import { IBotContext } from "../../context/context.interface";
 import { emojis } from "../../utils/emojies";
 import { methods } from "../../utils/methods";
 import { Command } from "../command.module";
 
-export class UsernameCommand extends Command {
-  constructor(bot: IBotContext) {
-    super(bot);
-  }
+export default new Command({
+  pattern: /^(?:ник|nick)$/i,
+  name: "ник",
+  description: "Изменение никнейма",
 
-  async handle(context: MessageContext): Promise<void> {
+  async handler(context, bot) {
     const { text } = context;
     if (!text) return;
 
@@ -17,7 +15,7 @@ export class UsernameCommand extends Command {
 
     if (!username) {
       await methods.editMessage({
-        api: this.bot.api,
+        api: bot.api,
         context,
         message: `${emojis.warning} Не указан юзернейм. Пример: .н ник <новый ник>`,
       });
@@ -27,7 +25,7 @@ export class UsernameCommand extends Command {
 
     if (username.length > 25 || username.length < 3) {
       await methods.editMessage({
-        api: this.bot.api,
+        api: bot.api,
         context,
         message: `${emojis.warning} Ник должен содержать от 3 до 25 символов.`,
       });
@@ -35,7 +33,7 @@ export class UsernameCommand extends Command {
       return;
     }
 
-    await this.bot.prisma.user.update({
+    await bot.prisma.user.update({
       where: {
         id: context.senderId,
       },
@@ -45,9 +43,9 @@ export class UsernameCommand extends Command {
     });
 
     await methods.editMessage({
-      api: this.bot.api,
+      api: bot.api,
       context,
       message: `${emojis.success} Ник изменен на ['${username}'].`,
     });
-  }
-}
+  },
+});

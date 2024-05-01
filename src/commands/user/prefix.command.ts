@@ -1,15 +1,13 @@
-import { MessageContext } from "vk-io";
-import { IBotContext } from "../../context/context.interface";
 import { emojis } from "../../utils/emojies";
 import { methods } from "../../utils/methods";
 import { Command } from "../command.module";
 
-export class PrefixCommand extends Command {
-  constructor(bot: IBotContext) {
-    super(bot);
-  }
+export default new Command({
+  pattern: /^(?:префикс|prefix)$/i,
+  name: "префикс",
+  description: "Изменение префикса",
 
-  async handle(context: MessageContext): Promise<void> {
+  async handler(context, bot) {
     const { text } = context;
     if (!text) return;
 
@@ -17,7 +15,7 @@ export class PrefixCommand extends Command {
 
     if (!prefixType || !newPrefix) {
       await methods.editMessage({
-        api: this.bot.api,
+        api: bot.api,
         context,
         message: `${emojis.warning} Не указан префикс. Пример: .н префикс <тип префикса> <новый префикс>`,
       });
@@ -34,7 +32,7 @@ export class PrefixCommand extends Command {
     const prefixField = prefixMap[prefixType];
     if (!prefixField) {
       await methods.editMessage({
-        api: this.bot.api,
+        api: bot.api,
         context,
         message: `${emojis.warning} Указан некорректный тип префикса.`,
       });
@@ -42,7 +40,7 @@ export class PrefixCommand extends Command {
       return;
     }
 
-    await this.bot.prisma.prefix.update({
+    await bot.prisma.prefix.update({
       where: {
         userId: context.senderId,
       },
@@ -51,24 +49,24 @@ export class PrefixCommand extends Command {
       },
     });
 
-    if (this.bot.owner.prefix) {
+    if (bot.owner.prefix) {
       switch (prefixMap[prefixType]) {
         case "command":
-          this.bot.owner.prefix.command = newPrefix;
+          bot.owner.prefix.command = newPrefix;
           break;
         case "script":
-          this.bot.owner.prefix.script = newPrefix;
+          bot.owner.prefix.script = newPrefix;
           break;
         case "admin":
-          this.bot.owner.prefix.admin = newPrefix;
+          bot.owner.prefix.admin = newPrefix;
           break;
       }
     }
 
     await methods.editMessage({
-      api: this.bot.api,
+      api: bot.api,
       context,
       message: `${emojis.success} Префикс ${prefixType} установлен на [${newPrefix}].`,
     });
-  }
-}
+  },
+});

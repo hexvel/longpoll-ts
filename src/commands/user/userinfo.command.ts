@@ -1,17 +1,15 @@
-import { MessageContext } from "vk-io";
-import { IBotContext } from "../../context/context.interface";
 import { emojis } from "../../utils/emojies";
 import { helpers } from "../../utils/helpers";
 import { methods } from "../../utils/methods";
 import { Command } from "../command.module";
 
-export class UserInfoCommand extends Command {
-  constructor(bot: IBotContext) {
-    super(bot);
-  }
+export default new Command({
+  pattern: /^(?:инфо|info)$/i,
+  name: "инфо",
+  description: "Вывод информации о пользователе",
 
-  async handle(context: MessageContext): Promise<void> {
-    const userId = await helpers.resolveResourceId(this.bot.api, context);
+  async handler(context, bot) {
+    const userId = await helpers.resolveResourceId(bot.api, context);
 
     const ranks: { [key: number]: string } = {
       5: "Разработчик",
@@ -21,7 +19,7 @@ export class UserInfoCommand extends Command {
       1: "Пользователь",
     };
 
-    const userData = await this.bot.prisma.user.findUnique({
+    const userData = await bot.prisma.user.findUnique({
       where: {
         id: userId,
       },
@@ -32,7 +30,7 @@ export class UserInfoCommand extends Command {
 
     if (!userData) {
       await methods.editMessage({
-        api: this.bot.api,
+        api: bot.api,
         context,
         message: `${emojis.warning} [id${userId}|Пользователь не найден.]`,
       });
@@ -53,10 +51,10 @@ ${emojis.bomb} Префикс админки: ${userData.prefix?.admin}
     `.trim();
 
     methods.editMessage({
-      api: this.bot.api,
+      api: bot.api,
       context,
       message,
-      attachments: this.bot.owner.cover_image,
+      attachments: bot.owner.cover_image,
     });
-  }
-}
+  },
+});
