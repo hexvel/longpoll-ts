@@ -1,7 +1,7 @@
 import { MessageContext } from "vk-io";
-import { IBotContext } from "../context/context.interface";
-import { methods } from "../utils/methods";
-import { Command } from "./command.module";
+import { IBotContext } from "../../context/context.interface";
+import { methods } from "../../utils/methods";
+import { Command } from "../command.module";
 
 export class PingCommand extends Command {
   constructor(bot: IBotContext) {

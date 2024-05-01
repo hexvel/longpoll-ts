@@ -3,7 +3,6 @@ import { API, MessageContext, resolveResource } from "vk-io";
 class Helpers {
   async resolveResourceId(api: API, context: MessageContext): Promise<number> {
     await context.loadMessagePayload();
-
     const splitText = context.text?.split(" ");
     const resourceSpecifier = splitText ? splitText[2] : undefined;
 

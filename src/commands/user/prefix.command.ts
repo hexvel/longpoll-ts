@@ -1,8 +1,8 @@
 import { MessageContext } from "vk-io";
-import { IBotContext } from "../context/context.interface";
-import { emojis } from "../utils/emojies";
-import { methods } from "../utils/methods";
-import { Command } from "./command.module";
+import { IBotContext } from "../../context/context.interface";
+import { emojis } from "../../utils/emojies";
+import { methods } from "../../utils/methods";
+import { Command } from "../command.module";
 
 export class PrefixCommand extends Command {
   constructor(bot: IBotContext) {

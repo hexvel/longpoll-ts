@@ -1,21 +1,22 @@
 import { PrismaClient } from "@prisma/client";
 import { MessageContext, VK } from "vk-io";
 
-import { BlackListCommand } from "./commands/blackList.command";
 import { Command } from "./commands/command.module";
-import { FriendCommand } from "./commands/friends.command";
-import { PingCommand } from "./commands/ping.command";
+import { BlackListCommand } from "./commands/user/blackList.command";
+import { FriendCommand } from "./commands/user/friends.command";
+import { PingCommand } from "./commands/user/ping.command";
 
 import { IBotContext } from "./context/context.interface";
 import { UserModel } from "./entities/user.model";
 
 import chalk from "chalk";
-import { PrefixCommand } from "./commands/prefix.command";
-import { UserInfoCommand } from "./commands/userinfo.command";
+import { RegistrationCommand } from "./commands/admin/registration.command";
+import { PrefixCommand } from "./commands/user/prefix.command";
+import { UserInfoCommand } from "./commands/user/userinfo.command";
 import { emojis } from "./utils/emojies";
 import { methods } from "./utils/methods";
 
-class Bot {
+export class Bot {
   private readonly bot: IBotContext;
   public readonly commands: Map<string, Command> = new Map();
 
@@ -38,13 +39,23 @@ class Bot {
 
   /**
    * Sets up the commands for the bot.
+   */
+  private setupCommands() {
+    this.setupUserCommands();
+    this.setupAdminCommands();
+
+    this.setupEventHandlers();
+  }
+
+  /**
+   * Sets up the commands for the bot.
    *
    * This function initializes the commands for the bot and maps them to their respective keys.
    *
    * @private
    * @returns {void} This function does not return anything.
    */
-  private setupCommands(): void {
+  private setupUserCommands(): void {
     const friendsCommand = new FriendCommand(this.bot);
     const blackListCommand = new BlackListCommand(this.bot);
 
@@ -58,6 +69,31 @@ class Bot {
   }
 
   /**
+   * Sets up the admin commands for the bot.
+   *
+   * This function initializes the admin commands for the bot and maps them to their respective keys.
+   *
+   * @private
+   * @returns {void} This function does not return anything.
+   */
+  private setupAdminCommands(): void {
+    this.commands.set("рег", new RegistrationCommand(this.bot));
+  }
+
+  /**
+   * Sets up event handlers for the bot.
+   */
+  private setupEventHandlers(): void {
+    this.bot.updates.on(
+      "message_new",
+      (context: MessageContext, next: () => void) => {
+        this.handleUserNewMessage(context, next);
+        this.handleAdminNewMessage(context, next);
+      }
+    );
+  }
+
+  /**
    * Starts the bot by connecting to the Prisma client, setting up the message_new event listener,
    * and starting the updates. If an error occurs during the process, it logs the error and exits the process.
    *
@@ -65,9 +101,8 @@ class Bot {
    */
   public async start(): Promise<void> {
     try {
-      this.bot.updates.on("message_new", this.handleNewMessage.bind(this));
+      this.bot.updates.start();
       await this.prismaClient.$connect();
-      await this.bot.updates.start();
     } catch (error) {
       console.error("Error starting bot:", error);
       process.exit(1);
@@ -80,12 +115,14 @@ class Bot {
    * @param {MessageContext} context - The message context containing information about the message.
    * @param {() => void} next - The function to call to proceed to the next middleware.
    */
-  private async handleNewMessage(context: MessageContext, next: () => void) {
+  private async handleUserNewMessage(
+    context: MessageContext,
+    next: () => void
+  ) {
     try {
       if (context.senderId !== this.bot.owner.id) return;
 
       const messageText = context.text?.toLowerCase().trim();
-
       const [prefix, command] = messageText?.split(" ") || [];
 
       if (prefix !== this.bot.owner.prefix?.command) return;
@@ -108,6 +145,32 @@ class Bot {
       console.error("Error handling new message:", error);
     } finally {
       next();
+    }
+  }
+
+  /**
+   * Handles a new message from an admin user.
+   *
+   * @param {MessageContext} context - The message context containing information about the message.
+   * @param {() => void} next - The function to call to proceed to the next middleware.
+   * @return {Promise<void>} - A promise that resolves when the message handling is complete.
+   */
+  private async handleAdminNewMessage(
+    context: MessageContext,
+    next: () => void
+  ): Promise<void> {
+    try {
+      if (context.senderId !== this.bot.owner.id) return;
+
+      const messageText = context.text?.toLowerCase().trim();
+      const [prefix, command] = messageText?.split(" ") || [];
+
+      if (prefix !== this.bot.owner.prefix?.admin) return;
+
+      const cmd = this.commands.get(command);
+      if (cmd) await cmd.handle(context);
+    } catch (error) {
+      console.error("Error handling new message:", error);
     }
   }
 }
@@ -144,13 +207,13 @@ async function run(): Promise<void> {
           `${emojis.sparkle} Юзер ${chalk.cyan.underline.bold(user.id)} запущен`
         )
       );
-      console.log(
-        chalk.magenta(`${emojis.speechBalloon} Зарегистрированные функции:`)
-      );
+      // console.log(
+      //   chalk.magenta(`${emojis.speechBalloon} Зарегистрированные функции:`)
+      // );
 
-      for (const [name] of bot.commands.entries()) {
-        console.log(chalk.yellowBright(`\t${emojis.lightning} ${name}`));
-      }
+      // for (const [name] of bot.commands.entries()) {
+      //   console.log(chalk.yellowBright(`\t${emojis.lightning} ${name}`));
+      // }
     });
   } catch (error) {
     console.error("Failed to start", error);
