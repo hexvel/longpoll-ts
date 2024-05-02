@@ -9,7 +9,7 @@ export default new Command({
   name: "рег",
   description: "Регистрация нового пользователя",
 
-  async handler(context, bot) {
+  handler: async (context, bot) => {
     await context.loadMessagePayload();
 
     if (!context.replyMessage || !context.replyMessage.text) {

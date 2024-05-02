@@ -7,7 +7,7 @@ export default new Command({
   name: "ник",
   description: "Изменение никнейма",
 
-  async handler(context, bot) {
+  handler: async (context, bot) => {
     const { text } = context;
     if (!text) return;
 

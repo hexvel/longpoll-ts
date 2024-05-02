@@ -7,7 +7,7 @@ export default new Command({
   name: "пинг",
   description: "вывод пинга",
 
-  async handler(context, bot) {
+  handler: async (context, bot) => {
     const nowInMillis = Date.now();
 
     await bot.prisma.user.findFirst({});

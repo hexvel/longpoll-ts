@@ -8,7 +8,7 @@ export default new Command({
   name: "инфо",
   description: "Вывод информации о пользователе",
 
-  async handler(context, bot) {
+  handler: async (context, bot) => {
     const userId = await helpers.resolveResourceId(bot.api, context);
 
     const ranks: { [key: number]: string } = {

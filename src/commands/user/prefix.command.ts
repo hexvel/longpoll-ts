@@ -7,7 +7,7 @@ export default new Command({
   name: "префикс",
   description: "Изменение префикса",
 
-  async handler(context, bot) {
+  handler: async (context, bot) => {
     const { text } = context;
     if (!text) return;
 

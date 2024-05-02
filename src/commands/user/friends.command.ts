@@ -8,7 +8,7 @@ export default new Command({
   name: "др",
   description: "Добавление/удаление юзера из друзей",
 
-  async handler(context, bot) {
+  handler: async (context, bot) => {
     const action = context.text?.split(" ")[1];
     const userId = await helpers.resolveResourceId(bot.api, context);
 

@@ -9,7 +9,7 @@ export default new Command({
   name: "дов",
   description: "Добавление/удаление юзера из игнора",
 
-  async handler(context, bot) {
+  handler: async (context, bot) => {
     const { list } = bot.owner!;
     const data = helpers.parsePrismaJSON<IList>(
       list as unknown as IList,

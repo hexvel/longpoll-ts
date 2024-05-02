@@ -7,10 +7,12 @@ import ignoreCommand from "./commands/arrays/ignore.command";
 import ignoresCommand from "./commands/arrays/ignores.command";
 import trustCommand from "./commands/arrays/trust.command";
 import trustsCommand from "./commands/arrays/trusts.command";
+import addToChatCommand from "./commands/user/addToChat.command";
 import blackListCommand from "./commands/user/blackList.command";
 import friendsCommand from "./commands/user/friends.command";
 import pingCommand from "./commands/user/ping.command";
 import prefixCommand from "./commands/user/prefix.command";
+import removeFromChatCommand from "./commands/user/removeFromChat.command";
 import userinfoCommand from "./commands/user/userinfo.command";
 import usernameCommand from "./commands/user/username.command";
 
@@ -81,16 +83,26 @@ export class BotApp {
    * @return {void} This function does not return anything.
    */
   private setupCommands(bot: Bot): void {
+    // Fun commands
     bot.registerCommand(pingCommand.pattern, pingCommand.handler);
     bot.registerCommand(friendsCommand.pattern, friendsCommand.handler);
     bot.registerCommand(blackListCommand.pattern, blackListCommand.handler);
     bot.registerCommand(prefixCommand.pattern, prefixCommand.handler);
     bot.registerCommand(userinfoCommand.pattern, userinfoCommand.handler);
     bot.registerCommand(usernameCommand.pattern, usernameCommand.handler);
+
+    // Array commands
     bot.registerCommand(trustCommand.pattern, trustCommand.handler);
     bot.registerCommand(trustsCommand.pattern, trustsCommand.handler);
     bot.registerCommand(ignoreCommand.pattern, ignoreCommand.handler);
     bot.registerCommand(ignoresCommand.pattern, ignoresCommand.handler);
+
+    // For chats
+    bot.registerCommand(addToChatCommand.pattern, addToChatCommand.handler);
+    bot.registerCommand(
+      removeFromChatCommand.pattern,
+      removeFromChatCommand.handler
+    );
   }
 }
 

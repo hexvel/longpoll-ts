@@ -9,7 +9,7 @@ export default new Command({
   name: "игноры",
   description: "Вывод списка юзеров из игнора",
 
-  async handler(context, bot) {
+  handler: async (context, bot) => {
     const { ignore } = helpers.parsePrismaJSON<IList>(
       bot.owner.list as unknown as IList,
       "ignore"

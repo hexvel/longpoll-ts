@@ -12,14 +12,18 @@ class Helpers {
       return context.replyMessage?.senderId || context.senderId;
     }
 
-    const resolvedResource = await resolveResource({
-      api: api,
-      resource: resourceSpecifier,
-    });
+    try {
+      const resolvedResource = await resolveResource({
+        api: api,
+        resource: resourceSpecifier,
+      });
 
-    return resolvedResource?.type === "group"
-      ? -resolvedResource.id
-      : resolvedResource.id;
+      return resolvedResource?.type === "group"
+        ? -resolvedResource.id
+        : resolvedResource.id;
+    } catch {
+      return context.senderId;
+    }
   }
 
   parsePrismaJSON<T>(obj: T, key?: string): T {

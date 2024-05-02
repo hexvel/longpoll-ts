@@ -9,7 +9,7 @@ export default new Command({
   name: "довы",
   description: "Вывод списка юзеров из дова",
 
-  async handler(context, bot) {
+  handler: async (context, bot) => {
     const { trust } = helpers.parsePrismaJSON<IList>(
       bot.owner.list as unknown as IList,
       "trust"
