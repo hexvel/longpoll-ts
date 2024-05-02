@@ -30,7 +30,6 @@ export default new Command({
           message: successMessage,
         });
       } catch (error) {
-        console.error("Ошибка при добавлении триггера:", error);
         const errorMessage = `${emojis.error} Произошла ошибка при добавлении триггера. Пожалуйста, попробуйте ещё раз.`;
         return methods.editMessage({
           api: bot.api,
@@ -54,7 +53,6 @@ export default new Command({
           message: successMessage,
         });
       } catch (error) {
-        console.error("Ошибка при удалении триггера:", error);
         const errorMessage = `${emojis.error} Произошла ошибка при удалении триггера. Пожалуйста, попробуйте ещё раз.`;
         return methods.editMessage({
           api: bot.api,

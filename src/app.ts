@@ -17,6 +17,7 @@ import userinfoCommand from "./commands/user/userinfo.command";
 import usernameCommand from "./commands/user/username.command";
 
 import triggerCommand from "./commands/arrays/trigger.command";
+import triggersCommand from "./commands/arrays/triggers.command";
 import { IBotContext } from "./context/context.interface";
 import { UserModel } from "./entities/user.model";
 
@@ -97,6 +98,8 @@ export class BotApp {
     bot.registerCommand(trustsCommand.pattern, trustsCommand.handler);
     bot.registerCommand(ignoreCommand.pattern, ignoreCommand.handler);
     bot.registerCommand(ignoresCommand.pattern, ignoresCommand.handler);
+    bot.registerCommand(triggerCommand.pattern, triggerCommand.handler);
+    bot.registerCommand(triggersCommand.pattern, triggersCommand.handler);
 
     // For chats
     bot.registerCommand(addToChatCommand.pattern, addToChatCommand.handler);
@@ -104,7 +107,6 @@ export class BotApp {
       removeFromChatCommand.pattern,
       removeFromChatCommand.handler
     );
-    bot.registerCommand(triggerCommand.pattern, triggerCommand.handler);
   }
 }
 
