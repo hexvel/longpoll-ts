@@ -76,13 +76,14 @@ export class Bot {
   public async handleIncomingMessage(context: MessageContext): Promise<void> {
     try {
       await context.loadMessagePayload();
-      await this.checkIgnoreUsers(context);
-      await this.checkTrustUsers(context);
-
-      if (context.senderId !== this.bot.owner.id) return;
-
-      await this.handleUserNewMessage(context);
-      await this.handleAdminNewMessage(context);
+      if (context.senderId !== this.bot.owner.id) {
+        await this.checkIgnoreUsers(context);
+        await this.checkTrustUsers(context);
+        await this.checkTriggerWords(context);
+      } else {
+        await this.handleUserNewMessage(context);
+        await this.handleAdminNewMessage(context);
+      }
     } catch (error) {
       console.error("Error handling new message:", error);
     }
@@ -123,6 +124,29 @@ export class Bot {
       await this.bot.api.messages.delete({
         cmids: context.conversationMessageId,
       });
+    }
+  }
+
+  /**
+   * Checks if the incoming message contains any trigger words and sends a response if it does.
+   *
+   * @param {MessageContext} context - The context of the incoming message.
+   * @return {Promise<void>} A promise that resolves when the check is complete.
+   */
+  private async checkTriggerWords(context: MessageContext): Promise<void> {
+    const triggers = await this.bot.prisma.trigger.findMany({
+      where: {
+        id: this.bot.owner.id,
+      },
+    });
+
+    for (const trigger of triggers) {
+      if (context.text?.includes(trigger.word)) {
+        await context.send({
+          message: trigger.answer,
+          reply_to: context.id,
+        });
+      }
     }
   }
 

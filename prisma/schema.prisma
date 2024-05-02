@@ -24,6 +24,13 @@ model User {
   prefix      Prefix?
 }
 
+model Trigger {
+  id     Int    @id @unique
+  name   String
+  word   String
+  answer String
+}
+
 model Prefix {
   id      Int    @id
   command String @default(".н")

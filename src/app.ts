@@ -16,6 +16,7 @@ import removeFromChatCommand from "./commands/user/removeFromChat.command";
 import userinfoCommand from "./commands/user/userinfo.command";
 import usernameCommand from "./commands/user/username.command";
 
+import triggerCommand from "./commands/arrays/trigger.command";
 import { IBotContext } from "./context/context.interface";
 import { UserModel } from "./entities/user.model";
 
@@ -103,6 +104,7 @@ export class BotApp {
       removeFromChatCommand.pattern,
       removeFromChatCommand.handler
     );
+    bot.registerCommand(triggerCommand.pattern, triggerCommand.handler);
   }
 }
 
