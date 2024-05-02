@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import chalk from "chalk";
 import { VK } from "vk-io";
 import { Bot } from "./bot";
 
@@ -16,10 +15,12 @@ import removeFromChatCommand from "./commands/user/removeFromChat.command";
 import userinfoCommand from "./commands/user/userinfo.command";
 import usernameCommand from "./commands/user/username.command";
 
+import chalk from "chalk";
 import triggerCommand from "./commands/arrays/trigger.command";
 import triggersCommand from "./commands/arrays/triggers.command";
 import { IBotContext } from "./context/context.interface";
 import { UserModel } from "./entities/user.model";
+import { emojis } from "./utils/emojies";
 
 export class BotApp {
   private readonly prismaClient: PrismaClient;
@@ -44,22 +45,29 @@ export class BotApp {
    */
   public async run(): Promise<void> {
     for (const user of this.users) {
-      console.log(
+      console.error(
         chalk.green(
-          `Starting bot for user: ` + chalk.underline.bold.cyan(user.id)
+          `Starting bot for user: ${chalk.underline.bold.cyan(user.id)}`
         )
       );
 
       const bot = this.createBot(user);
       await bot.start();
 
-      console.log(
+      console.error(
         chalk.blue(
-          `Bot for user ` +
-            chalk.underline.yellow(user.id) +
-            ` started successfully`
+          `Bot for user ${chalk.underline.yellow(user.id)} started successfully`
         )
       );
+
+      console.log(chalk.yellow("Registered commands:"));
+
+      for (const command of bot.commands) {
+        console.log(
+          chalk.magenta(`${emojis.lightning} ${chalk.bold.cyan(command.name)}`)
+        );
+        console.log(chalk.gray(`   |-- ${command.description}`));
+      }
     }
   }
 
@@ -86,27 +94,24 @@ export class BotApp {
    */
   private setupCommands(bot: Bot): void {
     // Fun commands
-    bot.registerCommand(pingCommand.pattern, pingCommand.handler);
-    bot.registerCommand(friendsCommand.pattern, friendsCommand.handler);
-    bot.registerCommand(blackListCommand.pattern, blackListCommand.handler);
-    bot.registerCommand(prefixCommand.pattern, prefixCommand.handler);
-    bot.registerCommand(userinfoCommand.pattern, userinfoCommand.handler);
-    bot.registerCommand(usernameCommand.pattern, usernameCommand.handler);
+    bot.registerCommand(pingCommand);
+    bot.registerCommand(friendsCommand);
+    bot.registerCommand(blackListCommand);
+    bot.registerCommand(prefixCommand);
+    bot.registerCommand(userinfoCommand);
+    bot.registerCommand(usernameCommand);
 
     // Array commands
-    bot.registerCommand(trustCommand.pattern, trustCommand.handler);
-    bot.registerCommand(trustsCommand.pattern, trustsCommand.handler);
-    bot.registerCommand(ignoreCommand.pattern, ignoreCommand.handler);
-    bot.registerCommand(ignoresCommand.pattern, ignoresCommand.handler);
-    bot.registerCommand(triggerCommand.pattern, triggerCommand.handler);
-    bot.registerCommand(triggersCommand.pattern, triggersCommand.handler);
+    bot.registerCommand(trustCommand);
+    bot.registerCommand(trustsCommand);
+    bot.registerCommand(ignoreCommand);
+    bot.registerCommand(ignoresCommand);
+    bot.registerCommand(triggerCommand);
+    bot.registerCommand(triggersCommand);
 
     // For chats
-    bot.registerCommand(addToChatCommand.pattern, addToChatCommand.handler);
-    bot.registerCommand(
-      removeFromChatCommand.pattern,
-      removeFromChatCommand.handler
-    );
+    bot.registerCommand(addToChatCommand);
+    bot.registerCommand(removeFromChatCommand);
   }
 }
 

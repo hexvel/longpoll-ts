@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { MessageContext } from "vk-io";
+import { ICommand } from "./commands/command.module";
 import { IBotContext } from "./context/context.interface";
 import { IList, UserModel } from "./entities/user.model";
 import { helpers } from "./utils/helpers";
@@ -11,6 +12,8 @@ type CommandHandler = (
 
 interface CommandRegistration {
   pattern: string | RegExp;
+  name: string;
+  description: string;
   handler: CommandHandler;
 }
 
@@ -55,15 +58,17 @@ export class Bot {
   /**
    * Registers a new command with the specified pattern and handler.
    *
-   * @param {string | RegExp} pattern - The pattern to match for the command.
+   * @param {RegExp} pattern - The pattern to match for the command.
    * @param {CommandHandler} handler - The handler function for the command.
    * @return {void} This function does not return anything.
    */
-  public registerCommand(
-    pattern: string | RegExp,
-    handler: CommandHandler
-  ): void {
-    this.commands.push({ pattern, handler });
+  public registerCommand(command: ICommand): void {
+    this.commands.push({
+      pattern: command.pattern,
+      name: command.name,
+      description: command.description,
+      handler: command.handler,
+    });
   }
 
   /**
