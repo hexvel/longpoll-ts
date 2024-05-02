@@ -16,11 +16,11 @@ import userinfoCommand from "./commands/user/userinfo.command";
 import usernameCommand from "./commands/user/username.command";
 
 import chalk from "chalk";
+import registrationCommand from "./commands/admin/registration.command";
 import triggerCommand from "./commands/arrays/trigger.command";
 import triggersCommand from "./commands/arrays/triggers.command";
 import { IBotContext } from "./context/context.interface";
 import { UserModel } from "./entities/user.model";
-import { emojis } from "./utils/emojies";
 
 export class BotApp {
   private readonly prismaClient: PrismaClient;
@@ -59,15 +59,6 @@ export class BotApp {
           `Bot for user ${chalk.underline.yellow(user.id)} started successfully`
         )
       );
-
-      console.log(chalk.yellow("Registered commands:"));
-
-      for (const command of bot.commands) {
-        console.log(
-          chalk.magenta(`${emojis.lightning} ${chalk.bold.cyan(command.name)}`)
-        );
-        console.log(chalk.gray(`   |-- ${command.description}`));
-      }
     }
   }
 
@@ -112,6 +103,9 @@ export class BotApp {
     // For chats
     bot.registerCommand(addToChatCommand);
     bot.registerCommand(removeFromChatCommand);
+
+    // Admin comands
+    bot.registerCommand(registrationCommand);
   }
 }
 

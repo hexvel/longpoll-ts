@@ -1,6 +1,9 @@
+import chalk from "chalk";
 import { API, MessageContext, resolveResource } from "vk-io";
+import { Bot } from "../bot";
 import { IBotContext } from "../context/context.interface";
 import { IList } from "../entities/user.model";
+import { emojis } from "./emojies";
 
 class Helpers {
   async resolveResourceId(api: API, context: MessageContext): Promise<number> {
@@ -55,6 +58,17 @@ class Helpers {
         "Ошибка при обновлении списка игнорируемых пользователей:",
         error
       );
+    }
+  }
+
+  async logRegisteredCommands(bot: Bot): Promise<void> {
+    console.log(chalk.yellow("Registered commands:"));
+
+    for (const command of bot.commands) {
+      console.log(
+        chalk.magenta(`${emojis.lightning} ${chalk.bold.red(command.name)}`)
+      );
+      console.log(chalk.cyan(`   |-- ${command.description}`));
     }
   }
 }

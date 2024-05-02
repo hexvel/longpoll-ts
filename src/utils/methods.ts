@@ -5,7 +5,7 @@ import {
 } from "../entities/context.model";
 
 class VkMethods {
-  async checkToken(token: string): Promise<boolean> {
+  async checkToken(token: string): Promise<{ isOk: boolean; token: string }> {
     const appId = 6121396;
     let isOk = false;
 
@@ -23,7 +23,7 @@ class VkMethods {
       isOk = false;
     }
 
-    return isOk;
+    return { isOk, token };
   }
 
   async sendMessage(params: ISendMessageContext) {

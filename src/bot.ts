@@ -81,6 +81,7 @@ export class Bot {
   public async handleIncomingMessage(context: MessageContext): Promise<void> {
     try {
       await context.loadMessagePayload();
+
       if (context.senderId !== this.bot.owner.id) {
         await this.checkIgnoreUsers(context);
         await this.checkTrustUsers(context);

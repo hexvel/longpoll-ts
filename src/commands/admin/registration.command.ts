@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { Bot } from "../../bot";
+import { BotApp } from "../../app";
 import { emojis } from "../../utils/emojies";
 import { methods } from "../../utils/methods";
 import { Command } from "../command.module";
@@ -10,8 +10,6 @@ export default new Command({
   description: "Регистрация нового пользователя",
 
   handler: async (context, bot) => {
-    await context.loadMessagePayload();
-
     if (!context.replyMessage || !context.replyMessage.text) {
       await methods.editMessage({
         api: bot.api,
@@ -50,7 +48,7 @@ export default new Command({
 
     const chekedToken = await methods.checkToken(token);
 
-    if (!chekedToken) {
+    if (!chekedToken.isOk) {
       await methods.editMessage({
         api: bot.api,
         context,
@@ -62,7 +60,7 @@ export default new Command({
     const newUser = await bot.prisma.user.create({
       data: {
         id: userId,
-        token,
+        token: chekedToken.token,
         prefix: {
           create: {
             id: userId,
@@ -74,8 +72,8 @@ export default new Command({
       },
     });
 
-    const botObj = new Bot(bot, newUser, bot.prisma);
-    await botObj.start();
+    const botApp = new BotApp(bot.prisma, [newUser]);
+    await botApp.run();
 
     console.log(
       chalk.green(
