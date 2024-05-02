@@ -8,23 +8,25 @@ export default new Command({
   description: "вывод пинга",
 
   handler: async (context, bot) => {
-    const nowInMillis = Date.now();
+    const nowInMillis = performance.now();
 
     await bot.prisma.user.findFirst({});
-    const dbLatency = Date.now() - nowInMillis;
+    const dbLatency = performance.now() - nowInMillis;
 
-    const apiStart = Date.now();
+    const apiStart = performance.now();
     await methods.editMessage({
       api: bot.api,
       context,
       message: `${emojis.sparkle} Измерение времени API`,
     });
-    const apiLatency = Date.now() - apiStart;
+    const apiLatency = performance.now() - apiStart;
 
     methods.editMessage({
       api: bot.api,
       context,
-      message: `🎂 API: ${apiLatency} ms | DB took: ${dbLatency} ms`,
+      message: `🎂 API: ${apiLatency.toFixed(
+        2
+      )} ms | DB took: ${dbLatency.toFixed(2)} ms`,
     });
   },
 });
