@@ -1,6 +1,7 @@
 import { Attachment, ExternalAttachment, MessageContext } from "vk-io";
 import { IBotContext } from "../../context/context.interface";
 import { emojis } from "../../utils/emojies";
+import { helpers } from "../../utils/helpers";
 import { methods } from "../../utils/methods";
 import { Command } from "../command.module";
 
@@ -66,9 +67,7 @@ export default new Command({
   handler: async (context, bot) => {
     await context.loadMessagePayload();
 
-    const [_, ...rest] = context.text?.split(" ")!;
-    const [action, ...ctxArray] = rest;
-    const name = ctxArray.join(" ");
+    const { action, sub: name } = await helpers.getAfterSplit(context.text!);
 
     if (action === "+шаб") {
       if (!context.replyMessage) {

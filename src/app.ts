@@ -23,6 +23,7 @@ import templatesCommand from "./commands/arrays/templates.command";
 import triggerCommand from "./commands/arrays/trigger.command";
 import triggersCommand from "./commands/arrays/triggers.command";
 import sendTemplateCommand from "./commands/user/sendTemplate.command";
+import weatherCommand from "./commands/user/weather.command";
 import { IBotContext } from "./context/context.interface";
 import { UserModel } from "./entities/user.model";
 
@@ -96,6 +97,7 @@ export class BotApp {
     bot.registerCommand(userinfoCommand);
     bot.registerCommand(usernameCommand);
     bot.registerCommand(sendTemplateCommand);
+    bot.registerCommand(weatherCommand);
 
     // Array commands
     bot.registerCommand(trustCommand);

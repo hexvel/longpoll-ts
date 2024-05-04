@@ -71,6 +71,16 @@ class Helpers {
       console.log(chalk.cyan(`   |-- ${command.description}`));
     }
   }
+
+  async getAfterSplit(
+    text: string
+  ): Promise<{ prefix: string; action: string; sub: string }> {
+    const [prefix, ...rest] = text.split(" ")!;
+    const [action, ...ctxArray] = rest;
+    const sub = ctxArray.join(" ");
+
+    return { prefix, action, sub };
+  }
 }
 
 export const helpers = new Helpers();

@@ -1,5 +1,6 @@
 import { getRandomId } from "vk-io";
 import { emojis } from "../../utils/emojies";
+import { helpers } from "../../utils/helpers";
 import { methods } from "../../utils/methods";
 import { Command } from "../command.module";
 
@@ -8,9 +9,7 @@ export default new Command({
   name: "шаб",
   description: "Отправка шаблона",
   handler: async (context, bot) => {
-    const [_, ...rest] = context.text?.split(" ")!;
-    const [__, ...ctxArray] = rest;
-    const name = ctxArray.join(" ");
+    const { sub: name } = await helpers.getAfterSplit(context.text!);
 
     if (!name) {
       return await methods.editMessage({
