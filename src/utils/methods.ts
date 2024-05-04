@@ -1,4 +1,5 @@
 import { API, getRandomId } from "vk-io";
+import { MessagesSendUserIdsResponse } from "vk-io/lib/api/schemas/responses";
 import {
   IEditMessageContext,
   ISendMessageContext,
@@ -26,20 +27,25 @@ class VkMethods {
     return { isOk, token };
   }
 
-  async sendMessage(params: ISendMessageContext) {
-    await params.api.messages.send({
-      peer_id: params.context.peerId,
+  async sendMessage(
+    params: ISendMessageContext
+  ): Promise<MessagesSendUserIdsResponse> {
+    const response = await params.api.messages.send({
+      peer_id: params.peerId || params.context?.peerId,
       message: params.message,
+      attachment: params.attachments,
       random_id: getRandomId(),
     });
+
+    return response;
   }
 
   async editMessage(params: IEditMessageContext) {
     await params.api.messages.edit({
-      peer_id: params.context.peerId,
+      peer_id: params.peerId || params.context?.peerId,
       message: params.message,
       attachment: params.attachments,
-      message_id: params.messageId || params.context.id,
+      message_id: params.messageId || params.context?.id,
       keep_forward_messages: true,
     });
   }

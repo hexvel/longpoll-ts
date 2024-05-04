@@ -3,6 +3,7 @@ import { API, MessageContext } from "vk-io";
 export interface IEditMessageContext {
   api: API;
   context: MessageContext;
+  peerId?: number;
   message: string;
   attachments?: string;
   messageId?: number;
@@ -10,7 +11,9 @@ export interface IEditMessageContext {
 
 export interface ISendMessageContext {
   api: API;
-  context: MessageContext;
-  message: string;
+  context?: MessageContext;
+  peerId?: number;
+  message?: string;
+  attachments?: string;
   randomId?: number;
 }

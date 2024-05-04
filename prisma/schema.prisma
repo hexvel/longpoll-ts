@@ -31,6 +31,13 @@ model Trigger {
   answer String
 }
 
+model Template {
+  id         Int     @id @unique
+  name       String
+  cmid       Int
+  attachment String?
+}
+
 model Prefix {
   id      Int    @id
   command String @default(".н")

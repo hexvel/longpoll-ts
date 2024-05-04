@@ -17,8 +17,11 @@ import usernameCommand from "./commands/user/username.command";
 
 import chalk from "chalk";
 import registrationCommand from "./commands/admin/registration.command";
+import templateCommand from "./commands/arrays/template.command";
+import templatesCommand from "./commands/arrays/templates.command";
 import triggerCommand from "./commands/arrays/trigger.command";
 import triggersCommand from "./commands/arrays/triggers.command";
+import sendTemplateCommand from "./commands/user/sendTemplate.command";
 import { IBotContext } from "./context/context.interface";
 import { UserModel } from "./entities/user.model";
 
@@ -91,6 +94,7 @@ export class BotApp {
     bot.registerCommand(prefixCommand);
     bot.registerCommand(userinfoCommand);
     bot.registerCommand(usernameCommand);
+    bot.registerCommand(sendTemplateCommand);
 
     // Array commands
     bot.registerCommand(trustCommand);
@@ -99,6 +103,8 @@ export class BotApp {
     bot.registerCommand(ignoresCommand);
     bot.registerCommand(triggerCommand);
     bot.registerCommand(triggersCommand);
+    bot.registerCommand(templateCommand);
+    bot.registerCommand(templatesCommand);
 
     // For chats
     bot.registerCommand(addToChatCommand);
