@@ -44,6 +44,7 @@ export default new Command({
     await bot.api.messages.delete({
       peer_id: context.peerId,
       message_ids: context.id,
+      delete_for_all: true,
     });
 
     const attachment = message.items[0].attachments
