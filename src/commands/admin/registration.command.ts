@@ -77,7 +77,9 @@ export default new Command({
 
     console.log(
       chalk.green(
-        `${emojis.sparkle} Юзер ${chalk.cyan.underline.bold(userId)} запущен`
+        `${emojis.sparkle} User ${chalk.cyan.underline.bold(
+          userId
+        )} successfully registered`
       )
     );
 

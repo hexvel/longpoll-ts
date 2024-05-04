@@ -17,6 +17,7 @@ import usernameCommand from "./commands/user/username.command";
 
 import chalk from "chalk";
 import registrationCommand from "./commands/admin/registration.command";
+import removeCommand from "./commands/admin/remove.command";
 import templateCommand from "./commands/arrays/template.command";
 import templatesCommand from "./commands/arrays/templates.command";
 import triggerCommand from "./commands/arrays/trigger.command";
@@ -112,6 +113,7 @@ export class BotApp {
 
     // Admin comands
     bot.registerCommand(registrationCommand);
+    bot.registerCommand(removeCommand);
   }
 }
 

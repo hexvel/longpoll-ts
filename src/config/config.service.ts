@@ -1,28 +1,21 @@
-import { config, DotenvParseOutput } from "dotenv";
+import { IBotContext } from "../context/context.interface";
 import { IConfigService } from "./config.interface";
 
 export class ConfigService implements IConfigService {
-  private config: DotenvParseOutput;
+  private config: Map<string | number, IBotContext | string>;
 
   constructor() {
-    const { error, parsed } = config();
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    if (!parsed) {
-      throw new Error(".env file is empty");
-    }
-
-    this.config = parsed;
+    this.config = new Map<string | number, IBotContext | string>();
   }
 
-  get(key: string): string {
-    const result = this.config[key];
-    if (!result) {
-      throw new Error(`${key} is not defined`);
-    }
+  set(key: string | number, value: IBotContext | string): void {
+    this.config.set(key, value);
+  }
 
-    return result;
+  get(key: string | number): string | string | IBotContext {
+    const value = this.config.get(key);
+    return value!;
   }
 }
+
+export const config = new ConfigService();

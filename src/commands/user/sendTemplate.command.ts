@@ -9,7 +9,7 @@ export default new Command({
   description: "Отправка шаблона",
   handler: async (context, bot) => {
     const [_, ...rest] = context.text?.split(" ")!;
-    const [action, ...ctxArray] = rest;
+    const [__, ...ctxArray] = rest;
     const name = ctxArray.join(" ");
 
     if (!name) {
@@ -50,7 +50,7 @@ export default new Command({
     const attachment = message.items[0].attachments
       .map(
         obj =>
-          `photo${obj.photo.owner_id}_${obj.photo.id}_${obj.photo.access_key}`
+          `${obj.type}${obj.photo.owner_id}_${obj.photo.id}_${obj.photo.access_key}`
       )
       .join("");
 

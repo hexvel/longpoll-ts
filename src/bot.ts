@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { MessageContext } from "vk-io";
 import { ICommand } from "./commands/command.module";
+import { config } from "./config/config.service";
 import { IBotContext } from "./context/context.interface";
 import { IList, UserModel } from "./entities/user.model";
 import { helpers } from "./utils/helpers";
@@ -35,6 +36,7 @@ export class Bot {
   ) {
     this.bot = botContext;
     this.bot.prisma = prismaClient;
+    this.bot.updates = botContext.updates;
     this.bot.owner = user;
 
     this.setupEventHandlers();
@@ -47,6 +49,7 @@ export class Bot {
    */
   public async start(): Promise<void> {
     try {
+      config.set(this.bot.owner.id, this.bot);
       this.bot.updates.start();
       await this.bot.prisma.$connect();
     } catch (error) {
@@ -87,8 +90,8 @@ export class Bot {
         await this.checkTrustUsers(context);
         await this.checkTriggerWords(context);
       } else {
-        await this.handleUserNewMessage(context);
         await this.handleAdminNewMessage(context);
+        await this.handleUserNewMessage(context);
       }
     } catch (error) {
       console.error("Error handling new message:", error);
