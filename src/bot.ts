@@ -54,13 +54,15 @@ export class Bot {
    * @param {CommandHandler} handler - The handler function for the command.
    * @return {void} This function does not return anything.
    */
-  public registerCommand(command: ICommand): void {
-    this.commands.push({
-      pattern: command.pattern,
-      name: command.name,
-      description: command.description,
-      handler: command.handler,
-    });
+  public registerCommands(commands: ICommand[]): void {
+    for (const command of commands) {
+      this.commands.push({
+        pattern: command.pattern,
+        name: command.name,
+        description: command.description,
+        handler: command.handler,
+      });
+    }
   }
 
   /**

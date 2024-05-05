@@ -37,13 +37,15 @@ export class Group {
    * @param {ICommand} command - The command object containing pattern, name, description, and handler.
    * @return {void} This function does not return anything.
    */
-  public registerCommand(command: ICommand): void {
-    this.commands.push({
-      pattern: command.pattern,
-      name: command.name,
-      description: command.description,
-      handler: command.handler,
-    });
+  public registerCommands(commands: ICommand[]): void {
+    for (const command of commands) {
+      this.commands.push({
+        pattern: command.pattern,
+        name: command.name,
+        description: command.description,
+        handler: command.handler,
+      });
+    }
   }
 
   /**
