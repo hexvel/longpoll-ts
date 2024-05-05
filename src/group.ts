@@ -31,6 +31,12 @@ export class Group {
     }
   }
 
+  /**
+   * Registers a new command with the specified pattern, name, description, and handler.
+   *
+   * @param {ICommand} command - The command object containing pattern, name, description, and handler.
+   * @return {void} This function does not return anything.
+   */
   public registerCommand(command: ICommand): void {
     this.commands.push({
       pattern: command.pattern,
@@ -40,6 +46,12 @@ export class Group {
     });
   }
 
+  /**
+   * Handles an incoming message by calling the handleUserNewMessage function.
+   *
+   * @param {MessageContext} context - The context of the incoming message.
+   * @return {Promise<void>} A promise that resolves when the message is handled.
+   */
   public async handleIncomingMessage(context: MessageContext): Promise<void> {
     try {
       await this.handleUserNewMessage(context);
@@ -48,6 +60,15 @@ export class Group {
     }
   }
 
+  /**
+   * Sets up event handlers for the group.
+   *
+   * This function registers a callback function for the "message_new" event of the group's updates.
+   * The callback function handles incoming messages by calling the `handleIncomingMessage` method
+   * and then invokes the `next` function.
+   *
+   * @return {void} This function does not return anything.
+   */
   private setupEventHandlers(): void {
     this.group.updates.on(
       "message_new",
@@ -58,6 +79,12 @@ export class Group {
     );
   }
 
+  /**
+   * Handles a new user message by checking the prefix and command, and executing the corresponding handler.
+   *
+   * @param {MessageContext} context - The context of the message.
+   * @return {Promise<void>} A promise that resolves when the message is handled.
+   */
   private async handleUserNewMessage(context: MessageContext): Promise<void> {
     const trim = context.text?.trimStart();
     if (!trim || trim[0] !== "!") return;
