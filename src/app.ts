@@ -135,7 +135,8 @@ export class BotApp {
     await botApp.run();
 
     const groupApp = new BotApp(prismaClient);
-    const token = "да";
+    const token =
+      "vk1.a.gdjWufBoIpgxTsDqLNnmewIbEbJq5EMPwYDagSMUVg9QczZgxlxU5HMDqq_N1Yq_IN_9JnVQUc6m-hVe7CZ1Vd5_mYfs_SOdjZRD_UUR3Go5X2h7DPXImVSrMcdfj-p1fhNIfb95NXM1J2maG8evVxKT6haH6AHanqq13hZDAID6oHckg3rP7bazmDW-uTxc1REmw7eRyqJt5dsqWWFhkQ";
     await groupApp.run({ bot: { id: 224391972, token } });
   } catch (error) {
     console.error("Failed to start bot:", error);

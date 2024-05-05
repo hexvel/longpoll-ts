@@ -9,13 +9,13 @@ export default new GroupCommand({
   description: "запуск бота у пользователя",
 
   handler: async (context, bot) => {
-    const user = await bot.prisma.user.findUnique({
+    const data = await bot.prisma.user.findUnique({
       where: {
         id: context.senderId,
       },
     });
 
-    if (!user) {
+    if (!data) {
       await context.send(
         `[id${context.senderId}|${emojis.error} Вы не зарегистрированы.]`
       );
@@ -23,9 +23,9 @@ export default new GroupCommand({
       return;
     }
 
-    const configUser = config.get(context.senderId) as IGroupContext;
+    const user = config.get(context.senderId) as IGroupContext;
 
-    if (configUser.updates.isStarted) {
+    if (user.updates.isStarted) {
       await context.send(
         `[id${context.senderId}|${emojis.error} Бот уже запущен.]`
       );
@@ -33,7 +33,9 @@ export default new GroupCommand({
       return;
     }
 
-    await configUser.updates.start();
+    // @ts-expect-error non standard behavior
+    user.updates.pollingTransport.ts = 0;
+    await user.updates.start();
 
     await context.send(
       `[id${context.senderId}|${emojis.success} Бот запущен.]`
