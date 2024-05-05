@@ -1,4 +1,4 @@
-import { IBotContext } from "../context/context.interface";
+import { IBotContext, IGroupContext } from "../context/context.interface";
 import { IConfigService } from "./config.interface";
 
 export class ConfigService implements IConfigService {
@@ -12,7 +12,7 @@ export class ConfigService implements IConfigService {
     this.config.set(key, value);
   }
 
-  get(key: string | number): string | string | IBotContext {
+  get(key: string | number): string | string | IBotContext | IGroupContext {
     const value = this.config.get(key);
     return value!;
   }

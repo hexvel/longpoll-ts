@@ -22,10 +22,14 @@ import templateCommand from "./commands/arrays/template.command";
 import templatesCommand from "./commands/arrays/templates.command";
 import triggerCommand from "./commands/arrays/trigger.command";
 import triggersCommand from "./commands/arrays/triggers.command";
+import disableGroupCommand from "./commands/group/user/disable.groupCommand";
+import enableGroupCommand from "./commands/group/user/enable.groupCommand";
+import pingGroupCommand from "./commands/group/user/ping.groupCommand";
 import sendTemplateCommand from "./commands/user/sendTemplate.command";
 import weatherCommand from "./commands/user/weather.command";
-import { IBotContext } from "./context/context.interface";
-import { UserModel } from "./entities/user.model";
+import { IBotContext, IGroupContext } from "./context/context.interface";
+import { GroupModel, UserModel } from "./entities/user.model";
+import { Group } from "./group";
 
 export class BotApp {
   private readonly prismaClient: PrismaClient;
@@ -37,9 +41,9 @@ export class BotApp {
    * @param {PrismaClient} prismaClient - The Prisma client.
    * @param {UserModel[]} users - An array of UserModel objects.
    */
-  constructor(prismaClient: PrismaClient, users: UserModel[]) {
+  constructor(prismaClient: PrismaClient, users?: UserModel[]) {
     this.prismaClient = prismaClient;
-    this.users = users;
+    this.users = users!;
   }
 
   /**
@@ -48,7 +52,20 @@ export class BotApp {
    *
    * @return {Promise<void>} A promise that resolves once all bots have been started.
    */
-  public async run(): Promise<void> {
+  public async run(group?: { bot: GroupModel }): Promise<void> {
+    if (group) {
+      const bot = this.createGroup(group.bot);
+      await bot.start();
+
+      console.error(
+        chalk.green(
+          `Starting bot for group: ${chalk.underline.bold.cyan(group.bot.id)}`
+        )
+      );
+
+      return;
+    }
+
     for (const user of this.users) {
       console.error(
         chalk.green(
@@ -78,6 +95,15 @@ export class BotApp {
     const bot = new Bot(botContext, user, this.prismaClient);
 
     this.setupCommands(bot);
+
+    return bot;
+  }
+
+  private createGroup(group: GroupModel): Group {
+    const botContext = new VK({ token: group.token }) as IGroupContext;
+    const bot = new Group(botContext, this.prismaClient);
+
+    this.setupGroupCommands(bot);
 
     return bot;
   }
@@ -117,6 +143,12 @@ export class BotApp {
     bot.registerCommand(registrationCommand);
     bot.registerCommand(removeCommand);
   }
+
+  private setupGroupCommands(group: Group) {
+    group.registerCommand(pingGroupCommand);
+    group.registerCommand(enableGroupCommand);
+    group.registerCommand(disableGroupCommand);
+  }
 }
 
 (async () => {
@@ -128,6 +160,11 @@ export class BotApp {
 
     const botApp = new BotApp(prismaClient, users);
     await botApp.run();
+
+    const groupApp = new BotApp(prismaClient);
+    const token =
+      "vk1.a.3Wve7YA8f4Ib46pkwwPZY04kh42meqRKlEcZvBu7BHQ722Ya-LLEWEGqnESiAruhvMh24px9qUcTB5MRz4Mzy4jFjfGHgcFSIx9kYum1M34hY2e1TogW9_0wOdumieM-NsUM3buJNGMPMMeMQffeyaPeZN2AUgTFJGfa7z7qzxgnKJb38nXOgBTZGkN1uv0aj926LmUk8yv8DPSYkkftLA";
+    await groupApp.run({ bot: { id: 224391972, token } });
   } catch (error) {
     console.error("Failed to start bot:", error);
     process.exit(1);

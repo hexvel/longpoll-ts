@@ -8,3 +8,8 @@ export interface IBotContext extends VK {
   owner: UserFields;
   updates: Updates;
 }
+
+export interface IGroupContext extends VK {
+  prisma: PrismaClient;
+  updates: Updates;
+}

@@ -3,20 +3,9 @@ import { MessageContext } from "vk-io";
 import { ICommand } from "./commands/command.module";
 import { config } from "./config/config.service";
 import { IBotContext } from "./context/context.interface";
+import { CommandRegistration } from "./entities/command.model";
 import { IList, UserModel } from "./entities/user.model";
 import { helpers } from "./utils/helpers";
-
-type CommandHandler = (
-  context: MessageContext,
-  bot: IBotContext
-) => void | Promise<void>;
-
-interface CommandRegistration {
-  pattern: string | RegExp;
-  name: string;
-  description: string;
-  handler: CommandHandler;
-}
 
 export class Bot {
   private readonly bot: IBotContext;

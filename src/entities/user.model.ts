@@ -19,6 +19,11 @@ export interface UserModel {
   list: Prisma.JsonValue;
 }
 
+export interface GroupModel {
+  id: number;
+  token: string;
+}
+
 export interface IList {
   trust: number[];
   ignore: number[];
